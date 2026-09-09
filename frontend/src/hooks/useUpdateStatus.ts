@@ -1,6 +1,6 @@
 import { Events } from "@wailsio/runtime";
-import { GetUpdateStatus } from "../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
-import type { UpdateStatus } from "../../bindings/github.com/its-haze/league-rpc/internal/app/models";
+import { GetUpdateStatus } from "../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
+import type { UpdateStatus } from "../../bindings/github.com/ArtoMoon/arto-rpc/internal/app/models";
 import { createExternalStore } from "./createExternalStore";
 
 // Also emitted directly by main.go whenever the App Update coordinator's

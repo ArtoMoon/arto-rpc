@@ -6,8 +6,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/discord/ipc"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/discord/ipc"
 	"github.com/rs/zerolog"
 )
 
@@ -113,6 +113,19 @@ func (c *Client) UpdatePresence(rpcData *RPCData) error {
 		Str("state", rpcData.State).
 		Msg("Updating Discord presence")
 
+	var buttons []activityButton
+	if len(rpcData.Buttons) > 0 {
+		buttons = make([]activityButton, 0, len(rpcData.Buttons))
+		for _, b := range rpcData.Buttons {
+			if b.Label != "" && b.URL != "" {
+				buttons = append(buttons, activityButton{
+					Label: b.Label,
+					URL:   b.URL,
+				})
+			}
+		}
+	}
+
 	if err := c.setActivity(&activityPayload{
 		Details: rpcData.Details,
 		State:   rpcData.State,
@@ -123,6 +136,7 @@ func (c *Client) UpdatePresence(rpcData *RPCData) error {
 			SmallText:  rpcData.SmallText,
 		},
 		Timestamps: timestampFor(rpcData.Start),
+		Buttons:    buttons,
 	}); err != nil {
 		return fmt.Errorf("failed to set Discord activity: %w", err)
 	}

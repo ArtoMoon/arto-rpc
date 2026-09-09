@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/its-haze/league-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
 )
 
 type fakeWindow struct {

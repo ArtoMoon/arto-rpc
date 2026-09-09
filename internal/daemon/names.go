@@ -1,6 +1,6 @@
 package daemon
 
-import "github.com/its-haze/league-rpc/pkg/constants"
+import "github.com/ArtoMoon/arto-rpc/pkg/constants"
 
 // discordProcessNames are the process names checked to decide whether
 // Discord is running, before attempting an IPC connect.

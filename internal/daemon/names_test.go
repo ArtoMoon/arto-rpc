@@ -3,7 +3,7 @@ package daemon
 import (
 	"testing"
 
-	"github.com/its-haze/league-rpc/pkg/constants"
+	"github.com/ArtoMoon/arto-rpc/pkg/constants"
 )
 
 // TestLeagueProcessNames_ExcludesRiotClient guards against showing League as

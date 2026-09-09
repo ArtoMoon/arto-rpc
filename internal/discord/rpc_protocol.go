@@ -30,6 +30,12 @@ type activityPayload struct {
 	State      string             `json:"state,omitempty"`
 	Assets     *activityAssets    `json:"assets,omitempty"`
 	Timestamps *activityTimestamp `json:"timestamps,omitempty"`
+	Buttons    []activityButton   `json:"buttons,omitempty"`
+}
+
+type activityButton struct {
+	Label string `json:"label"`
+	URL   string `json:"url"`
 }
 
 type activityAssets struct {

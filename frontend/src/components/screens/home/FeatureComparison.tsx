@@ -9,7 +9,7 @@ interface FeatureRow {
 
 // Native = Discord's own built-in "detected game" activity for League, with
 const FEATURES: FeatureRow[] = [
-  // Shared with native detection first, then league-rpc-only in priority order.
+  // Shared with native detection first, then arto-rpc-only in priority order.
   { label: "Champion", native: true, leagueRpc: true },
   { label: "Skins, chromas & animated skins", native: false, leagueRpc: true },
   { label: "TFT companion", native: false, leagueRpc: true },
@@ -33,8 +33,8 @@ export function FeatureComparison() {
   return (
     <SettingsCard
       icon={ListChecks}
-      title="Why League RPC?"
-      description="What Discord detects on its own, next to what League RPC adds."
+      title="Why Arto RPC?"
+      description="What Discord detects on its own, next to what Arto RPC adds."
     >
 
       <table className="w-full text-sm">
@@ -42,7 +42,7 @@ export function FeatureComparison() {
           <tr className="text-muted border-border border-b text-xs">
             <th className="py-1.5 text-left font-medium">Feature</th>
             <th className="w-20 py-1.5 text-center font-medium">Native</th>
-            <th className="w-24 py-1.5 text-center font-medium">League RPC</th>
+            <th className="w-24 py-1.5 text-center font-medium">Arto RPC</th>
           </tr>
         </thead>
         <tbody>

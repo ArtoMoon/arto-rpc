@@ -6,13 +6,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/its-haze/league-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
 	"github.com/rs/zerolog"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
 // LogFileName is the active log file inside the logs directory.
-const LogFileName = "league-rpc.log"
+const LogFileName = "arto-rpc.log"
 
 // Options tunes the logger. The zero value is usable: it produces an
 // info-level logger with default sizes.
@@ -31,7 +31,7 @@ type Sink struct {
 	file   *lumberjack.Logger
 }
 
-// LogDir returns %APPDATA%\league-rpc\logs, creating it if missing.
+// LogDir returns %APPDATA%\arto-rpc\logs, creating it if missing.
 func LogDir() (string, error) {
 	base, err := config.GetConfigDir()
 	if err != nil {

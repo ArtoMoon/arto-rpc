@@ -1,6 +1,6 @@
 import { Bell, Palette, Power } from "lucide-react";
 import * as LabelPrimitive from "@radix-ui/react-label";
-import type { Config } from "../../../bindings/github.com/its-haze/league-rpc/internal/config/models";
+import type { Config } from "../../../bindings/github.com/ArtoMoon/arto-rpc/internal/config/models";
 import { withLaunchAtStartup, withNotifyUpdates } from "../../lib/behaviorPatch";
 import { Toggle, ThemePicker } from "../ui";
 

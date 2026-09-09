@@ -3,7 +3,7 @@ package state
 import (
 	"time"
 
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 )
 
 // State represents the complete application state.

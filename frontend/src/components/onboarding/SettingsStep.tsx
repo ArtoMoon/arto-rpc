@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { GetDisplayPreview } from "../../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
-import type { Config } from "../../../bindings/github.com/its-haze/league-rpc/internal/config/models";
+import { GetDisplayPreview } from "../../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
+import type { Config } from "../../../bindings/github.com/ArtoMoon/arto-rpc/internal/config/models";
 import { usePreviewAssets } from "../../hooks/usePreviewAssets";
 import { withShowEmojis, withShowRank, withShowStats } from "../../lib/displayPatch";
 import { DiscordPresenceCard } from "../DiscordPresenceCard";

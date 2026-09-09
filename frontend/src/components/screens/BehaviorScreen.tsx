@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import {
   GetStatus,
   SetPaused,
-} from "../../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+} from "../../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 import { useDefaultConfig } from "../../hooks/useDefaultConfig";
 import { useSettings } from "../../hooks/useSettings";
 import { useStatus } from "../../hooks/useStatus";
@@ -18,7 +18,7 @@ import { Select, SettingsCard, ThemePicker, Toggle, type SelectOption } from "..
 const CLOSE_ACTIONS: SelectOption[] = [
   { value: "ask", label: "Ask me every time" },
   { value: "tray", label: "Hide to tray" },
-  { value: "quit", label: "Quit League RPC" },
+  { value: "quit", label: "Quit Arto RPC" },
 ];
 
 // The Behavior section: how the app looks and behaves around the game.

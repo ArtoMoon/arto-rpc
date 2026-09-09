@@ -1,4 +1,4 @@
-import type { Config } from "../../bindings/github.com/its-haze/league-rpc/internal/config/models";
+import type { Config } from "../../bindings/github.com/ArtoMoon/arto-rpc/internal/config/models";
 
 // A representative Config tree for pure-logic tests; not the source of truth
 // for defaults (internal/config.DefaultConfig() is), just a fixture shape.
@@ -14,6 +14,13 @@ export function DefaultConfig(): Config {
     presence: {
       show_emojis: true,
       show_in_client: true,
+      always_active: false,
+      always_active_mode: "in-client",
+      always_active_champion: "Yasuo",
+      always_active_game_mode: "Ranked Solo/Duo",
+      credit_text: "",
+      button_label: "",
+      button_url: "",
       templates: {
         "in-client": { details: "{emoji}  {availability}", state: "In Client" },
         lobby: { details: "{queue}", state: "In Lobby ({players}/{max_players})" },
@@ -23,6 +30,7 @@ export function DefaultConfig(): Config {
         "in-game": { details: "{queue}", state: "In Game · {stats}" },
         "tft-in-game": { details: "{queue}", state: "In Game · lvl: {level}" },
         spectating: { details: "{mode}", state: "Spectating" },
+        "always-active": { details: "{emoji}  {availability}", state: "In Client" },
       },
     },
     behavior: {

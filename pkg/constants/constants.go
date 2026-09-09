@@ -3,12 +3,12 @@ package constants
 import (
 	"fmt"
 
-	"github.com/its-haze/league-rpc/internal/version"
+	"github.com/ArtoMoon/arto-rpc/internal/version"
 )
 
 const (
 	// Application Info
-	AppName = "League RPC"
+	AppName = "Arto RPC"
 
 	// Discord App IDs
 	DiscordAppIDDefault = "1194034071588851783" // League of Legends
@@ -47,7 +47,7 @@ const (
 
 // SmallText is the small-icon hover tooltip shown on every presence state.
 // Built at load time so the tooltip reports the running build, not a literal.
-var SmallText = fmt.Sprintf("its-haze/league-rpc @Github.com (%s)", version.Version())
+var SmallText = fmt.Sprintf("ArtoMoon/arto-rpc @Github.com (%s)", version.Version())
 
 // GameFlowPhases represents the different phases in the League Client
 var GameFlowPhases = struct {

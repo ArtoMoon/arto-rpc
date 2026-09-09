@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/logging"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/logging"
 )
 
 func TestApp_Logs_NilRingDegradesGracefully(t *testing.T) {

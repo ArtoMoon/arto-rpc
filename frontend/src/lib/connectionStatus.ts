@@ -1,4 +1,4 @@
-import type { StatusSnapshot } from "../../bindings/github.com/its-haze/league-rpc/internal/app/models";
+import type { StatusSnapshot } from "../../bindings/github.com/ArtoMoon/arto-rpc/internal/app/models";
 
 export type ConnectionTone = "ok" | "warn" | "idle";
 

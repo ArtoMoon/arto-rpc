@@ -1,5 +1,5 @@
 import { Radio } from "lucide-react";
-import type { StatusSnapshot } from "../../../../bindings/github.com/its-haze/league-rpc/internal/app/models";
+import type { StatusSnapshot } from "../../../../bindings/github.com/ArtoMoon/arto-rpc/internal/app/models";
 import { useDiscordAppName } from "../../../hooks/useDiscordAppName";
 import { useSettings } from "../../../hooks/useSettings";
 import { DiscordPresenceCard } from "../../DiscordPresenceCard";
@@ -20,7 +20,7 @@ export function PresencePreview({ status }: PresencePreviewProps) {
     <SettingsCard
       icon={Radio}
       title="Discord presence"
-      description="Exactly what League RPC last sent to Discord, not a re-guess of it."
+      description="Exactly what Arto RPC last sent to Discord, not a re-guess of it."
     >
 
       {status?.presence_cleared || !presence ? (

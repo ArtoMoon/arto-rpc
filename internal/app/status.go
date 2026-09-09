@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/its-haze/league-rpc/internal/discord"
-	"github.com/its-haze/league-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/internal/discord"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
 )
 
 // defaultStatusPollInterval is how often the bridge re-checks the connection

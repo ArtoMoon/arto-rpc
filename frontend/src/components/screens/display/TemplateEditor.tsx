@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import {
   GetDisplayPreview,
   GetTemplateTokens,
-} from "../../../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
-import type { PreviewAssets } from "../../../../bindings/github.com/its-haze/league-rpc/internal/app/models";
-import type { TemplatePair } from "../../../../bindings/github.com/its-haze/league-rpc/internal/config/models";
+} from "../../../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
+import type { PreviewAssets } from "../../../../bindings/github.com/ArtoMoon/arto-rpc/internal/app/models";
+import type { TemplatePair } from "../../../../bindings/github.com/ArtoMoon/arto-rpc/internal/config/models";
 import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 import { usePreviewAssets } from "../../../hooks/usePreviewAssets";
 import type { PresenceContext } from "../../../lib/presenceContexts";
@@ -63,6 +63,11 @@ function previewImages(
     case "spectating":
       // BuildSpectatingPresence: always the league logo as the small image.
       return { largeImage: assets.champion_skin_url, smallImage: assets.league_logo_url };
+    case "always-active":
+      return {
+        largeImage: assets.profile_icon_url || assets.league_logo_url,
+        smallImage: showRank ? assets.rank_emblem_url : assets.league_logo_url,
+      };
   }
 }
 

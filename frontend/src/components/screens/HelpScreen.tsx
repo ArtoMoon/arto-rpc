@@ -1,13 +1,13 @@
-import { Bug, LifeBuoy, MessageSquarePlus, PlayCircle, ScrollText } from "lucide-react";
+import { LifeBuoy, PlayCircle, ScrollText } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import {
   GetDiagnostics,
   OpenLogsFolder,
-} from "../../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+} from "../../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 import { useSettings } from "../../hooks/useSettings";
 import { formatDiagnostics } from "../../lib/diagnostics";
-import { BUG_REPORT_URL, DISCORD_COMMUNITY_URL, FEATURE_REQUEST_URL, openExternal } from "../../lib/links";
+import { DISCORD_COMMUNITY_URL, openExternal } from "../../lib/links";
 import { DiscordIcon } from "../icons";
 import { Button, SettingsCard } from "../ui";
 import { LogViewer } from "./help/LogViewer";
@@ -45,7 +45,7 @@ export function HelpScreen() {
       <SettingsCard
         icon={ScrollText}
         title="Logs"
-        description="What League RPC has been doing. Copy diagnostics grabs your version and settings too, which is what a bug report needs."
+        description="What Arto RPC has been doing. Copy diagnostics grabs your version and settings too, which is what a bug report needs."
         action={
           <>
             <Button variant="secondary" onClick={handleOpenFolder}>
@@ -69,12 +69,6 @@ export function HelpScreen() {
       >
         <HelpLink href={DISCORD_COMMUNITY_URL} icon={<DiscordIcon className="size-4" />}>
           Join the Discord community
-        </HelpLink>
-        <HelpLink href={BUG_REPORT_URL} icon={<Bug className="size-4" />}>
-          Report a bug
-        </HelpLink>
-        <HelpLink href={FEATURE_REQUEST_URL} icon={<MessageSquarePlus className="size-4" />}>
-          Request a feature
         </HelpLink>
       </SettingsCard>
 

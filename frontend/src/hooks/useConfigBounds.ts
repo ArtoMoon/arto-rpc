@@ -1,4 +1,4 @@
-import { GetConfigBounds } from "../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+import { GetConfigBounds } from "../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 import { UPDATE_INTERVAL_BOUNDS, STATS_POLLING_INTERVAL_BOUNDS, type Bounds } from "../lib/advancedBounds";
 import { createExternalStore } from "./createExternalStore";
 

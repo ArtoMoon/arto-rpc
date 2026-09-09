@@ -29,7 +29,7 @@ describe("howItWorksCopy", () => {
 
   it("says the user starts it, at any time, when launch at startup is off", () => {
     const { steps } = howItWorksCopy({ launchAtStartup: false, notifyUpdates: true });
-    expect(steps[0].body).toContain("You start League RPC yourself");
+    expect(steps[0].body).toContain("You start Arto RPC yourself");
     expect(steps[0].body).toContain("mid-game");
   });
 

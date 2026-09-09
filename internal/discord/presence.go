@@ -2,14 +2,48 @@ package discord
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/presence/template"
-	"github.com/its-haze/league-rpc/internal/state"
-	"github.com/its-haze/league-rpc/pkg/constants"
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/presence/template"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/pkg/constants"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 )
+
+// normalizeChampionID converts a display name or input to Data Dragon ID
+func normalizeChampionID(name string) string {
+	cleaned := strings.ReplaceAll(name, " ", "")
+	cleaned = strings.ReplaceAll(cleaned, "'", "")
+	cleaned = strings.ReplaceAll(cleaned, ".", "")
+	cleaned = strings.ReplaceAll(cleaned, "&", "")
+	switch strings.ToLower(cleaned) {
+	case "wukong":
+		return "MonkeyKing"
+	case "renataglasc", "renata":
+		return "Renata"
+	case "nunuwillump", "nunu":
+		return "Nunu"
+	case "belveth":
+		return "Belveth"
+	case "chogath":
+		return "Chogath"
+	case "kaisa":
+		return "Kaisa"
+	case "khazix":
+		return "Khazix"
+	case "leblanc":
+		return "Leblanc"
+	case "velkoz":
+		return "Velkoz"
+	default:
+		if len(cleaned) > 0 {
+			return strings.ToUpper(cleaned[:1]) + cleaned[1:]
+		}
+		return name
+	}
+}
 
 // queueDisplayName resolves the queue name shown as details, falling all
 // the way back to "League of Legends" so Discord never gets an empty string.
@@ -21,6 +55,118 @@ func queueDisplayName(st *state.State) string {
 		return name
 	}
 	return "League of Legends"
+}
+
+// getCreditText returns the configured credit text, falling back to constants.SmallText.
+func getCreditText(cfg *config.Config) string {
+	if cfg != nil {
+		return cfg.GetCreditText()
+	}
+	return constants.SmallText
+}
+
+// getButtons returns configured buttons if any.
+func getButtons(cfg *config.Config) []Button {
+	if cfg != nil && cfg.Presence.ButtonLabel != "" && cfg.Presence.ButtonURL != "" {
+		return []Button{{Label: cfg.Presence.ButtonLabel, URL: cfg.Presence.ButtonURL}}
+	}
+	return nil
+}
+
+// BuildAlwaysActivePresence builds RPC data for the always-on / static presence mode.
+func BuildAlwaysActivePresence(st *state.State, cfg *config.Config) *RPCData {
+	if cfg != nil && cfg.Presence.AlwaysActiveMode == "in-game" && cfg.Presence.AlwaysActiveChampion != "" {
+		champ := cfg.Presence.AlwaysActiveChampion
+		champID := normalizeChampionID(champ)
+		modeName := cfg.Presence.AlwaysActiveGameMode
+		if modeName == "" {
+			modeName = "Ranked Solo/Duo"
+		}
+
+		largeImage := GetChampionSkinURL(champID, 0)
+		largeText := champ
+
+		credit := getCreditText(cfg)
+		smallImage := GetLeagueLogoURL()
+		smallText := credit
+
+		if cfg.Display.Default.ShowRank && st != nil {
+			rankEmblemURL, rankText := getRankForQueue(st, st.QueueID)
+			if rankEmblemURL != "" {
+				smallImage = rankEmblemURL
+				smallText = rankText
+			}
+		}
+
+		var start int64
+		if st != nil && st.ApplicationStartTime > 0 {
+			start = st.ApplicationStartTime
+		}
+
+		return &RPCData{
+			LargeImage: largeImage,
+			LargeText:  largeText,
+			SmallImage: smallImage,
+			SmallText:  smallText,
+			Details:    modeName,
+			State:      "In Game",
+			Start:      start,
+			Buttons:    getButtons(cfg),
+		}
+	}
+
+	emoji := ""
+	availability := "Online"
+	if st != nil && st.Availability != "" {
+		availability = string(st.Availability)
+	}
+
+	if cfg.Presence.ShowEmojis {
+		emoji = "\U0001F7E2" // green circle
+		if st != nil && st.Availability == types.AvailabilityAway {
+			emoji = "\U0001F534" // red circle
+		}
+	}
+
+	details, stateText := renderPresenceText(cfg, template.ContextAlwaysActive, map[string]string{
+		"emoji":        emoji,
+		"availability": availability,
+	})
+
+	largeImage := GetLeagueLogoLargeURL()
+	largeText := "League of Legends"
+	if st != nil && st.SummonerIcon > 0 {
+		largeImage = GetProfileIconURL(st.SummonerIcon)
+	}
+
+	credit := getCreditText(cfg)
+	smallImage := GetLeagueLogoURL()
+	smallText := credit
+
+	if cfg.Display.Default.ShowRank && st != nil {
+		rankEmblemURL, rankText := getRankForQueue(st, st.QueueID)
+		if rankEmblemURL != "" {
+			largeText = credit
+			smallImage = rankEmblemURL
+			smallText = rankText
+		}
+	}
+
+	var start int64
+	if st != nil && st.ApplicationStartTime > 0 {
+		start = st.ApplicationStartTime
+	}
+
+	return &RPCData{
+		LargeImage: largeImage,
+		LargeText:  largeText,
+		SmallImage: smallImage,
+		SmallText:  smallText,
+		Details:    details,
+		State:      stateText,
+		Start:      start,
+		Buttons:    getButtons(cfg),
+	}
 }
 
 // BuildInClientPresence builds RPC data for when the player is idle in the client
@@ -42,10 +188,11 @@ func BuildInClientPresence(st *state.State, cfg *config.Config) *RPCData {
 		LargeImage: GetProfileIconURL(st.SummonerIcon),
 		LargeText:  "In Client",
 		SmallImage: GetLeagueLogoURL(),
-		SmallText:  constants.SmallText,
+		SmallText:  getCreditText(cfg),
 		Details:    details,
 		State:      stateText,
 		Start:      st.ApplicationStartTime,
+		Buttons:    getButtons(cfg),
 	}
 }
 
@@ -54,7 +201,7 @@ func BuildInLobbyPresence(st *state.State, cfg *config.Config) *RPCData {
 	largeImage := GetProfileIconURL(st.SummonerIcon)
 	largeText := FormatGameModeName(st.GameMode)
 	smallImage := GetMapIconURL(st.MapID)
-	smallText := constants.SmallText
+	smallText := getCreditText(cfg)
 
 	// Handle TFT - use companion instead of profile icon
 	if st.GameMode == types.GameModeTFT && st.TFTCompanionIcon != "" {
@@ -67,7 +214,7 @@ func BuildInLobbyPresence(st *state.State, cfg *config.Config) *RPCData {
 	if cfg.Display.Default.ShowRank {
 		rankEmblemURL, rankText := getRankForQueue(st, st.QueueID)
 		if rankEmblemURL != "" {
-			largeText = constants.SmallText
+			largeText = getCreditText(cfg)
 			smallImage = rankEmblemURL
 			smallText = rankText
 		}
@@ -92,6 +239,7 @@ func BuildInLobbyPresence(st *state.State, cfg *config.Config) *RPCData {
 		Details:    details,
 		State:      lobbyState,
 		Start:      st.ApplicationStartTime,
+		Buttons:    getButtons(cfg),
 	}
 }
 
@@ -100,7 +248,7 @@ func BuildInCustomLobbyPresence(st *state.State, cfg *config.Config) *RPCData {
 	largeImage := GetProfileIconURL(st.SummonerIcon)
 	largeText := FormatGameModeName(st.GameMode)
 	smallImage := GetMapIconURL(st.MapID)
-	smallText := constants.SmallText
+	smallText := getCreditText(cfg)
 
 	details, lobbyState := renderPresenceText(cfg, template.ContextCustomLobby, map[string]string{
 		"queue":       queueDisplayName(st),
@@ -116,6 +264,7 @@ func BuildInCustomLobbyPresence(st *state.State, cfg *config.Config) *RPCData {
 		Details:    details,
 		State:      lobbyState,
 		Start:      st.ApplicationStartTime,
+		Buttons:    getButtons(cfg),
 	}
 }
 
@@ -124,14 +273,14 @@ func BuildInQueuePresence(st *state.State, cfg *config.Config) *RPCData {
 	largeImage := GetProfileIconURL(st.SummonerIcon)
 	largeText := FormatGameModeName(st.GameMode)
 	smallImage := GetMapIconURL(st.MapID)
-	smallText := constants.SmallText
+	smallText := getCreditText(cfg)
 
 	// Rank known: swap the tooltip for the credit line, small image/text for
 	// the rank emblem/tier.
 	if cfg.Display.Default.ShowRank {
 		rankEmblemURL, rankText := getRankForQueue(st, st.QueueID)
 		if rankEmblemURL != "" {
-			largeText = constants.SmallText
+			largeText = getCreditText(cfg)
 			smallImage = rankEmblemURL
 			smallText = rankText
 		}
@@ -154,6 +303,7 @@ func BuildInQueuePresence(st *state.State, cfg *config.Config) *RPCData {
 		Details:    details,
 		State:      queueState,
 		Start:      time.Now().Unix(), // Start timer from now for queue time
+		Buttons:    getButtons(cfg),
 	}
 }
 
@@ -162,14 +312,14 @@ func BuildInChampSelectPresence(st *state.State, cfg *config.Config) *RPCData {
 	largeImage := GetProfileIconURL(st.SummonerIcon)
 	largeText := FormatGameModeName(st.GameMode)
 	smallImage := GetMapIconURL(st.MapID)
-	smallText := constants.SmallText
+	smallText := getCreditText(cfg)
 
 	// Rank known: swap the tooltip for the credit line, small image/text for
 	// the rank emblem/tier.
 	if cfg.Display.Default.ShowRank {
 		rankEmblemURL, rankText := getRankForQueue(st, st.QueueID)
 		if rankEmblemURL != "" {
-			largeText = constants.SmallText
+			largeText = getCreditText(cfg)
 			smallImage = rankEmblemURL
 			smallText = rankText
 		}
@@ -193,6 +343,7 @@ func BuildInChampSelectPresence(st *state.State, cfg *config.Config) *RPCData {
 		Details:    details,
 		State:      stateText,
 		Start:      time.Now().Unix(), // Start timer from now
+		Buttons:    getButtons(cfg),
 	}
 }
 
@@ -204,7 +355,7 @@ func BuildInGamePresence(st *state.State, cfg *config.Config) *RPCData {
 
 	// Small image: Rank emblem or League logo
 	smallImage := GetLeagueLogoURL()
-	smallText := constants.SmallText
+	smallText := getCreditText(cfg)
 
 	// Show rank emblem if enabled. Unlike Lobby/Queue/ChampSelect, largeText
 	// stays the skin name here rather than swapping to the credit line.
@@ -256,6 +407,7 @@ func BuildInGamePresence(st *state.State, cfg *config.Config) *RPCData {
 		Details:    details,
 		State:      gameState,
 		Start:      start,
+		Buttons:    getButtons(cfg),
 	}
 }
 
@@ -264,7 +416,7 @@ func BuildTFTInGamePresence(st *state.State, cfg *config.Config) *RPCData {
 	largeImage := st.TFTCompanionIcon
 	largeText := st.TFTCompanionName
 	smallImage := GetLeagueLogoURL()
-	smallText := constants.SmallText
+	smallText := getCreditText(cfg)
 
 	// Use TFT rank if available
 	if cfg.Display.Default.ShowRank && !st.TFTRank.IsEmpty() {
@@ -291,6 +443,7 @@ func BuildTFTInGamePresence(st *state.State, cfg *config.Config) *RPCData {
 		Details:    details,
 		State:      gameState,
 		Start:      start,
+		Buttons:    getButtons(cfg),
 	}
 }
 
@@ -324,10 +477,11 @@ func BuildSpectatingPresence(st *state.State, cfg *config.Config) *RPCData {
 		LargeImage: largeImage,
 		LargeText:  "Spectating",
 		SmallImage: GetLeagueLogoURL(),
-		SmallText:  constants.SmallText,
+		SmallText:  getCreditText(cfg),
 		Details:    details,
 		State:      stateText,
 		Start:      start,
+		Buttons:    getButtons(cfg),
 	}
 }
 

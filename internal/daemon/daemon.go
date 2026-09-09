@@ -6,9 +6,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/its-haze/league-rpc/internal/discord"
-	"github.com/its-haze/league-rpc/internal/state"
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/internal/discord"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 	"github.com/rs/zerolog"
 )
 
@@ -180,6 +180,7 @@ func (d *Daemon) presenceLoop(ctx context.Context) {
 	mode := modeUnknown
 	discordConnected := false
 	waitingForDiscordLogged := false
+	wasLCUConnected := false
 
 	// stalledSince marks when League came up without an LCU connection.
 	var stalledSince time.Time
@@ -286,6 +287,20 @@ func (d *Daemon) presenceLoop(ctx context.Context) {
 			waitingForDiscordLogged = false
 		}
 
+		if d.updater.Config().Presence.AlwaysActive {
+			stopPlaceholder()
+			stopLiveGame()
+			if mode != modeConnected || (wasLCUConnected && !d.lcu.Connected()) {
+				if d.discord.Connected() {
+					d.updater.ImmediateUpdate(d.state.Get())
+				}
+				mode = modeConnected
+			}
+			wasLCUConnected = d.lcu.Connected()
+			return
+		}
+		wasLCUConnected = d.lcu.Connected()
+
 		switch {
 		case d.lcu.Connected():
 			d.lcuStalled.Store(false)
@@ -328,7 +343,7 @@ func (d *Daemon) presenceLoop(ctx context.Context) {
 				if !stallLogged {
 					d.logger.Warn().
 						Dur("waited", d.now().Sub(stalledSince)).
-						Msg("League is running but the League Client API is not answering; check that League RPC can read the client's port")
+						Msg("League is running but the League Client API is not answering; check that Arto RPC can read the client's port")
 					stallLogged = true
 				}
 			}
@@ -356,16 +371,18 @@ func (d *Daemon) presenceLoop(ctx context.Context) {
 			if !ok {
 				return
 			}
-			if mode == modeConnected {
+			if mode == modeConnected && !d.updater.Config().Presence.AlwaysActive {
 				d.updater.DelayUpdate(st)
 			}
 
 		case <-cfgUpdates:
 			// Display settings may have changed; reflect them now instead of
 			// waiting for the next real state change or poll tick.
-			if mode == modeConnected {
+			if d.discord.Connected() && (d.updater.Config().Presence.AlwaysActive || mode == modeConnected) {
 				d.updater.ImmediateUpdate(d.state.Get())
+				mode = modeConnected
 			}
+			reconcile()
 
 		case <-placeholderC:
 			sendPlaceholder()

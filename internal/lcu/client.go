@@ -6,9 +6,9 @@ import (
 	"sync/atomic"
 
 	lcu "github.com/its-haze/lcu-gopher"
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/logging"
-	"github.com/its-haze/league-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/logging"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
 	"github.com/rs/zerolog"
 )
 

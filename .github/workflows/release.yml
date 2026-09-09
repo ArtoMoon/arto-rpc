@@ -14,7 +14,7 @@ env:
   WAILS_VERSION: "v3.0.0-beta.15"
   TASK_VERSION: "v3.53.1"
   # internal/updates.ReleaseAsset; a regression test keeps the two in step.
-  RELEASE_ASSET: "league-rpc-windows-amd64.bin"
+  RELEASE_ASSET: "arto-rpc-windows-amd64.bin"
 
 jobs:
   build:
@@ -56,11 +56,11 @@ jobs:
         run: |
           set -euo pipefail
           version="${GITHUB_REF_NAME#v}"
-          installer="bin/league-rpc-${version%%-*}-setup.exe"
+          installer="bin/arto-rpc-${version%%-*}-setup.exe"
           test -f "$installer" || { echo "no installer at $installer"; ls bin; exit 1; }
           mkdir -p dist
           # The updater's asset matcher only picks names carrying platform and arch.
-          mv bin/league-rpc.exe "dist/$RELEASE_ASSET"
+          mv bin/arto-rpc.exe "dist/$RELEASE_ASSET"
           mv "$installer" dist/
 
       - uses: actions/upload-artifact@v4

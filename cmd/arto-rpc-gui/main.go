@@ -1,4 +1,4 @@
-// Command league-rpc-gui runs the daemon and the desktop GUI in one process.
+// Command arto-rpc-gui runs the daemon and the desktop GUI in one process.
 package main
 
 import (
@@ -9,15 +9,15 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/its-haze/league-rpc/frontend"
-	"github.com/its-haze/league-rpc/internal/app"
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/daemon"
-	"github.com/its-haze/league-rpc/internal/discordapp"
-	"github.com/its-haze/league-rpc/internal/logging"
-	"github.com/its-haze/league-rpc/internal/startup"
-	"github.com/its-haze/league-rpc/internal/updates"
-	"github.com/its-haze/league-rpc/internal/version"
+	"github.com/ArtoMoon/arto-rpc/frontend"
+	"github.com/ArtoMoon/arto-rpc/internal/app"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/daemon"
+	"github.com/ArtoMoon/arto-rpc/internal/discordapp"
+	"github.com/ArtoMoon/arto-rpc/internal/logging"
+	"github.com/ArtoMoon/arto-rpc/internal/startup"
+	"github.com/ArtoMoon/arto-rpc/internal/updates"
+	"github.com/ArtoMoon/arto-rpc/internal/version"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 	"github.com/wailsapp/wails/v3/pkg/icons"
@@ -26,7 +26,7 @@ import (
 
 // singleInstanceID keeps a second launch from starting its own daemon; it
 // signals the running instance to surface its window instead.
-const singleInstanceID = "com.its-haze.league-rpc"
+const singleInstanceID = "com.artomoon.arto-rpc"
 
 func main() {
 	// A run launched by the Run entry carries the hidden marker. Drop any
@@ -64,7 +64,7 @@ func main() {
 	var mainWindow *application.WebviewWindow
 
 	wailsApp := application.New(application.Options{
-		Name:        "League RPC",
+		Name:        "Arto RPC",
 		Description: "League of Legends Discord Rich Presence",
 		Icon:        appIcon,
 		Assets:      application.AssetOptions{Handler: application.AssetFileServerFS(frontend.Assets())},
@@ -162,7 +162,7 @@ func main() {
 	// window.
 	windowWidth, windowHeight := defaultWindowSize()
 	mainWindow = wailsApp.Window.NewWithOptions(application.WebviewWindowOptions{
-		Title:            "League RPC",
+		Title:            "Arto RPC",
 		Width:            windowWidth,
 		Height:           windowHeight,
 		MinWidth:         minWindowWidth,
@@ -193,7 +193,7 @@ func main() {
 	systemTray := wailsApp.SystemTray.New()
 	systemTray.SetIcon(trayIcon)
 	systemTray.SetDarkModeIcon(trayIcon)
-	systemTray.SetTooltip("League RPC")
+	systemTray.SetTooltip("Arto RPC")
 	if runtime.GOOS == "darwin" {
 		systemTray.SetTemplateIcon(icons.SystrayMacTemplate)
 	}
@@ -207,9 +207,9 @@ func main() {
 	guiApp.OnUpdateChange(func(s app.UpdateStatus) {
 		wailsApp.Event.Emit(updateChangedEvent, s)
 		if s.Available {
-			systemTray.SetTooltip("League RPC (update available)")
+			systemTray.SetTooltip("Arto RPC (update available)")
 		} else {
-			systemTray.SetTooltip("League RPC")
+			systemTray.SetTooltip("Arto RPC")
 		}
 
 		if !s.Available {
@@ -226,7 +226,7 @@ func main() {
 		}
 		if err := notifier.SendNotification(notifications.NotificationOptions{
 			ID:    updateReadyNotificationID,
-			Title: "League RPC update available",
+			Title: "Arto RPC update available",
 			Body:  fmt.Sprintf("Version %s is available. Click to review and install.", s.Version),
 		}); err != nil {
 			sink.Logger.Warn().Err(err).Msg("could not show update-available notification")

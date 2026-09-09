@@ -1,5 +1,5 @@
 import { AppWindow, EyeOff, Gamepad2, ShieldCheck, type LucideIcon } from "lucide-react";
-import { DISCORD_COMMUNITY_URL, DISCORD_DEVELOPER_PORTAL_URL, GITHUB_REPO_URL } from "./links";
+import { DISCORD_COMMUNITY_URL, DISCORD_DEVELOPER_PORTAL_URL } from "./links";
 
 export interface FaqLink {
   label: string;
@@ -36,7 +36,6 @@ export const FAQ_GROUPS: FaqGroup[] = [
         question: "Why does Windows say it's dangerous?",
         answer:
           "It isn't code-signed, so SmartScreen gets twitchy about an .exe it hasn't seen before. That's the whole reason.",
-        links: [{ label: "Read the source", href: GITHUB_REPO_URL }],
       },
       {
         question: "Is this made by Riot?",
@@ -52,7 +51,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         question: "League's own status shows instead",
         answer:
-          "Give it a few seconds. Discord lets League's built-in integration overwrite ours, and League RPC keeps resending until it wins. Still wrong a minute later? That's a bug.",
+          "Give it a few seconds. Discord lets League's built-in integration overwrite ours, and Arto RPC keeps resending until it wins. Still wrong a minute later? That's a bug.",
         links: [{ label: "Ask on Discord", href: DISCORD_COMMUNITY_URL }],
       },
       {
@@ -73,9 +72,9 @@ export const FAQ_GROUPS: FaqGroup[] = [
     icon: AppWindow,
     entries: [
       {
-        question: "I opened League RPC but League didn't start",
+        question: "I opened Arto RPC but League didn't start",
         answer:
-          "It doesn't launch League, and that's deliberate: it's built to start with Windows, and nobody wants League opening the moment they boot. Start League however you normally do and League RPC picks it up, even mid-game.",
+          "It doesn't launch League, and that's deliberate: it's built to start with Windows, and nobody wants League opening the moment they boot. Start League however you normally do and Arto RPC picks it up, even mid-game.",
       },
       {
         question: "I closed the window and it's still running",

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/its-haze/league-rpc/internal/state"
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 	"github.com/rs/zerolog"
 )
 

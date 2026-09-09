@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/its-haze/league-rpc/internal/presence/template"
-	"github.com/its-haze/league-rpc/pkg/constants"
+	"github.com/ArtoMoon/arto-rpc/internal/presence/template"
+	"github.com/ArtoMoon/arto-rpc/pkg/constants"
 )
 
 // CurrentSchemaVersion is the version stamped on every config the app writes.
@@ -40,7 +40,14 @@ type DisplayDefaults struct {
 type PresenceConfig struct {
 	ShowEmojis   bool                    `json:"show_emojis"`    // online/away emoji
 	ShowInClient bool                    `json:"show_in_client"` // presence while idle in client
-	Templates    map[string]TemplatePair `json:"templates"`      // per-context text, keyed by context
+	AlwaysActive         bool                    `json:"always_active"`          // keep presence active 24/7 with the static presence
+	AlwaysActiveMode     string                  `json:"always_active_mode"`     // in-client | in-game
+	AlwaysActiveChampion string                  `json:"always_active_champion"` // fake in-game champion (e.g. Yasuo)
+	AlwaysActiveGameMode string                  `json:"always_active_game_mode"` // fake in-game mode (e.g. Ranked Solo/Duo)
+	CreditText           string                  `json:"credit_text"`            // custom text shown on hover (default: ArtoMoon/arto-rpc @Github.com)
+	ButtonLabel          string                  `json:"button_label"`           // optional Discord button label
+	ButtonURL            string                  `json:"button_url"`             // optional Discord button URL
+	Templates            map[string]TemplatePair `json:"templates"`              // per-context text, keyed by context
 }
 
 // TemplatePair is the editable text for one presence context: the two lines
@@ -64,6 +71,14 @@ type AdvancedConfig struct {
 	DebugMode            bool `json:"debug_mode"`             // verbose logging
 }
 
+// GetCreditText returns the configured credit text, falling back to constants.SmallText.
+func (c *Config) GetCreditText() string {
+	if c != nil && c.Presence.CreditText != "" {
+		return c.Presence.CreditText
+	}
+	return constants.SmallText
+}
+
 // DefaultConfig returns a fully populated tree at the current schema version.
 func DefaultConfig() *Config {
 	return &Config{
@@ -77,6 +92,13 @@ func DefaultConfig() *Config {
 		Presence: PresenceConfig{
 			ShowEmojis:   true,
 			ShowInClient: true,
+			AlwaysActive:         false,
+			AlwaysActiveMode:     "in-client",
+			AlwaysActiveChampion: "Yasuo",
+			AlwaysActiveGameMode: "Ranked Solo/Duo",
+			CreditText:           "",
+			ButtonLabel:  "",
+			ButtonURL:    "",
 			Templates:    defaultTemplates(),
 		},
 		Behavior: BehaviorConfig{
@@ -183,6 +205,15 @@ func (c *Config) clamp() {
 	}
 	if c.Advanced.StatsPollingInterval > MaxStatsPollingInterval {
 		c.Advanced.StatsPollingInterval = MaxStatsPollingInterval
+	}
+	if c.Presence.AlwaysActiveMode != "in-game" {
+		c.Presence.AlwaysActiveMode = "in-client"
+	}
+	if c.Presence.AlwaysActiveChampion == "" {
+		c.Presence.AlwaysActiveChampion = "Yasuo"
+	}
+	if c.Presence.AlwaysActiveGameMode == "" {
+		c.Presence.AlwaysActiveGameMode = "Ranked Solo/Duo"
 	}
 	if c.Presence.Templates == nil {
 		c.Presence.Templates = map[string]TemplatePair{}

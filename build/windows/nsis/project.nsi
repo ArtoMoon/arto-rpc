@@ -1,23 +1,23 @@
 Unicode true
 
 ####
-## Installer for League RPC. Values not defined here come from "wails_tools.nsh",
+## Installer for Arto RPC. Values not defined here come from "wails_tools.nsh",
 ## which is generated from build/config.yml by `task assets:update`.
 ##
 ## To build this by hand, outside of Task:
-## > makensis -DARG_WAILS_AMD64_BINARY=..\..\..\bin\league-rpc.exe project.nsi
+## > makensis -DARG_WAILS_AMD64_BINARY=..\..\..\bin\arto-rpc.exe project.nsi
 ####
 
 ## Add/Remove Programs key. Without this, wails_tools.nsh concatenates the
-## company and product names into "HazeLeague RPC".
-!define UNINST_KEY_NAME "LeagueRPC"
+## company and product names into "ArtoArto RPC".
+!define UNINST_KEY_NAME "ArtoRPC"
 
-## The app's single-instance mutex, from singleInstanceID in cmd/league-rpc-gui.
-!define APP_MUTEX "wails-app-com.its-haze.league-rpc-sim"
+## The app's single-instance mutex, from singleInstanceID in cmd/arto-rpc-gui.
+!define APP_MUTEX "wails-app-com.artomoon.arto-rpc-sim"
 
 ## Autorun value written by internal/startup; startup.ValueName must match.
 !define AUTORUN_KEY   "Software\Microsoft\Windows\CurrentVersion\Run"
-!define AUTORUN_VALUE "LeagueRPC"
+!define AUTORUN_VALUE "ArtoRPC"
 
 !include "wails_tools.nsh"
 

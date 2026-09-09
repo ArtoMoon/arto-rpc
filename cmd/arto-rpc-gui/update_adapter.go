@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/its-haze/league-rpc/internal/app"
-	"github.com/its-haze/league-rpc/internal/updates"
+	"github.com/ArtoMoon/arto-rpc/internal/app"
+	"github.com/ArtoMoon/arto-rpc/internal/updates"
 )
 
 // updateAdapter fits *updates.Coordinator to internal/app's AppUpdater

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/version"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/version"
 )
 
 // fakePauser records the last SetPaused value and reports it from IsPaused.
@@ -259,6 +259,18 @@ func TestApp_GetDisplayPreview_RejectsUnknownContext(t *testing.T) {
 	a := New(config.NewStore(config.DefaultConfig()), &fakePauser{})
 	if _, err := a.GetDisplayPreview("bogus", config.TemplatePair{}, true, true); err == nil {
 		t.Fatal("accepted an unknown presence context")
+	}
+}
+
+func TestApp_GetDisplayPreview_AlwaysActive(t *testing.T) {
+	a := New(config.NewStore(config.DefaultConfig()), &fakePauser{})
+
+	got, err := a.GetDisplayPreview("always-active", config.TemplatePair{}, true, true)
+	if err != nil {
+		t.Fatalf("GetDisplayPreview: %v", err)
+	}
+	if got.State != "In Client" {
+		t.Fatalf("State = %q, want 'In Client'", got.State)
 	}
 }
 

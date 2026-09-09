@@ -8,6 +8,7 @@ export const PRESENCE_CONTEXTS = [
   "in-game",
   "tft-in-game",
   "spectating",
+  "always-active",
 ] as const;
 
 export type PresenceContext = (typeof PRESENCE_CONTEXTS)[number];
@@ -21,6 +22,7 @@ export const PRESENCE_CONTEXT_LABELS: Record<PresenceContext, string> = {
   "in-game": "In game",
   "tft-in-game": "TFT in game",
   spectating: "Spectating",
+  "always-active": "Always active / Static",
 };
 
 export function isPresenceContext(value: string): value is PresenceContext {

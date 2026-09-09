@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/its-haze/league-rpc/internal/championdata"
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/internal/championdata"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 	"github.com/rs/zerolog"
 )
 

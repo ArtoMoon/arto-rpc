@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { Window } from "@wailsio/runtime";
-import { GetVersion } from "../../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+import { GetVersion } from "../../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 
 // Custom chrome for the frameless window (see Frameless in main.go).
 export function TitleBar() {
@@ -8,13 +8,13 @@ export function TitleBar() {
   const [maximised, setMaximised] = useState(false);
 
   useEffect(() => {
-    GetVersion().then(setVersion).catch(() => {});
+    GetVersion().then(setVersion).catch(() => { });
   }, []);
 
   useEffect(() => {
     Window.IsMaximised()
       .then(setMaximised)
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   async function toggleMaximise() {
@@ -28,7 +28,7 @@ export function TitleBar() {
       style={{ "--wails-draggable": "drag" } as CSSProperties}
     >
       <div className="flex items-center gap-2 px-3">
-        <span className="text-xs font-bold tracking-wider uppercase">League RPC</span>
+        <span className="text-xs font-bold tracking-wider uppercase">Arto RPC</span>
         {version && <span className="text-muted text-[11px]">v{version}</span>}
       </div>
 

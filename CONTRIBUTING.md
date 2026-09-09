@@ -18,8 +18,8 @@ Thanks for taking a look. Bug reports and pull requests are both welcome. If you
 ## Getting a build
 
 ```powershell
-git clone https://github.com/its-haze/league-rpc.git
-cd league-rpc
+git clone https://github.com/ArtoMoon/arto-rpc.git
+cd arto-rpc
 go mod download
 task build
 ```

@@ -14,7 +14,7 @@ installer=$(basename dist/*-setup.exe)
 installer_url="https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/$installer"
 # Display name only, no version in it; installer_url above still points at
 # the real versioned asset.
-installer_display="league-rpc-setup.exe"
+installer_display="arto-rpc-setup.exe"
 
 previous_tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null || true)
 if [[ -n "$previous_tag" ]]; then
@@ -26,13 +26,13 @@ fi
 cat >header.md <<HEADER
 ## Welcome to Release $GITHUB_REF_NAME
 
-Got questions? Join Discord: https://discord.haze.sh
+Got questions? Join Discord: https://discord.gg/uGNkFuK9cj
 
 ### Download
 
-Download and run **[$installer_display]($installer_url)** to install League RPC.
+Download and run **[$installer_display]($installer_url)** to install Arto RPC.
 
-Already have it installed? You don't need this. League RPC checks for updates on its own, and you can install them right from the About screen.
+Already have it installed? You don't need this. Arto RPC checks for updates on its own, and you can install them right from the About screen.
 
 ---
 

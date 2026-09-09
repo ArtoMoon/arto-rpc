@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { StatusSnapshot } from "../../bindings/github.com/its-haze/league-rpc/internal/app/models";
+import type { StatusSnapshot } from "../../bindings/github.com/ArtoMoon/arto-rpc/internal/app/models";
 import { summarizeConnection } from "./connectionStatus";
 
 function snapshot(over: Partial<StatusSnapshot> = {}): StatusSnapshot {

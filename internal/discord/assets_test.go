@@ -10,7 +10,7 @@ import (
 // Presence images are hotlinked out of this repository's own assets/ folder,
 // so deleting or renaming one silently breaks every user's Discord presence.
 func TestLogoURLsPointAtCommittedAssets(t *testing.T) {
-	const prefix = "https://github.com/Its-Haze/league-rpc/blob/master/"
+	const prefix = "https://github.com/ArtoMoon/arto-rpc/blob/master/"
 
 	for name, url := range map[string]string{
 		"leagueLogoURL":      leagueLogoURL,

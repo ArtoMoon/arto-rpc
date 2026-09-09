@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/its-haze/league-rpc/internal/presence/template"
+	"github.com/ArtoMoon/arto-rpc/internal/presence/template"
 )
 
 func TestDefaultConfig_ShipsEveryPresenceTemplate(t *testing.T) {
@@ -117,4 +117,16 @@ func contains(s, sub string) bool {
 		}
 	}
 	return false
+}
+
+func TestConfig_GetCreditText(t *testing.T) {
+	c := DefaultConfig()
+	if got := c.GetCreditText(); got == "" {
+		t.Errorf("GetCreditText() = %q, want non-empty default", got)
+	}
+
+	c.Presence.CreditText = "https://github.com/my-custom-url"
+	if got := c.GetCreditText(); got != "https://github.com/my-custom-url" {
+		t.Errorf("GetCreditText() = %q, want custom text", got)
+	}
 }

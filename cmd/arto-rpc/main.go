@@ -1,4 +1,4 @@
-// Command league-rpc runs the always-on background daemon. See ADR-0001/0002.
+// Command arto-rpc runs the always-on background daemon. See ADR-0001/0002.
 package main
 
 import (
@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/daemon"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/daemon"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -26,9 +26,9 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	logger.Info().Msg("League RPC starting")
+	logger.Info().Msg("Arto RPC starting")
 	d.Run(ctx)
-	logger.Info().Msg("League RPC stopped")
+	logger.Info().Msg("Arto RPC stopped")
 }
 
 func newLogger(debug bool) zerolog.Logger {

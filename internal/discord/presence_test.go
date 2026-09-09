@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/state"
-	"github.com/its-haze/league-rpc/pkg/constants"
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/pkg/constants"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 )
 
 func TestFormatSkinName(t *testing.T) {
@@ -332,5 +332,87 @@ func TestBuildInGamePresence_RankKnownDoesNotSwapLargeText(t *testing.T) {
 	got := BuildInGamePresence(st, cfg)
 	if got.LargeText == constants.SmallText {
 		t.Errorf("LargeText should stay the skin name, not the credit line, got %q", got.LargeText)
+	}
+}
+
+func TestBuildAlwaysActivePresence_Defaults(t *testing.T) {
+	cfg := config.DefaultConfig()
+	st := state.NewState()
+
+	got := BuildAlwaysActivePresence(st, cfg)
+	if got.State != "In Client" {
+		t.Errorf("State = %q, want In Client", got.State)
+	}
+	if got.SmallText != constants.SmallText {
+		t.Errorf("SmallText = %q, want %q", got.SmallText, constants.SmallText)
+	}
+	if len(got.Buttons) != 0 {
+		t.Errorf("Buttons = %v, want empty", got.Buttons)
+	}
+}
+
+func TestBuildAlwaysActivePresence_CustomCreditAndButton(t *testing.T) {
+	cfg := config.DefaultConfig()
+	cfg.Presence.CreditText = "custom credit"
+	cfg.Presence.ButtonLabel = "GitHub"
+	cfg.Presence.ButtonURL = "https://github.com/ArtoMoon/arto-rpc"
+	st := state.NewState()
+
+	got := BuildAlwaysActivePresence(st, cfg)
+	if got.SmallText != "custom credit" {
+		t.Errorf("SmallText = %q, want custom credit", got.SmallText)
+	}
+	if len(got.Buttons) != 1 || got.Buttons[0].Label != "GitHub" || got.Buttons[0].URL != "https://github.com/ArtoMoon/arto-rpc" {
+		t.Errorf("Buttons = %+v, want configured button", got.Buttons)
+	}
+}
+
+func TestBuildAlwaysActivePresence_InGame(t *testing.T) {
+	cfg := config.DefaultConfig()
+	cfg.Presence.AlwaysActiveMode = "in-game"
+	cfg.Presence.AlwaysActiveChampion = "Yasuo"
+	cfg.Presence.AlwaysActiveGameMode = "Ranked Solo/Duo"
+	st := state.NewState()
+
+	got := BuildAlwaysActivePresence(st, cfg)
+	if got.State != "In Game" {
+		t.Errorf("State = %q, want In Game", got.State)
+	}
+	if got.Details != "Ranked Solo/Duo" {
+		t.Errorf("Details = %q, want Ranked Solo/Duo", got.Details)
+	}
+	if got.LargeText != "Yasuo" {
+		t.Errorf("LargeText = %q, want Yasuo", got.LargeText)
+	}
+	wantLargeImage := GetChampionSkinURL("Yasuo", 0)
+	if got.LargeImage != wantLargeImage {
+		t.Errorf("LargeImage = %q, want %q", got.LargeImage, wantLargeImage)
+	}
+}
+
+func TestMapStateToPresence_AlwaysActiveOverridesInProgress(t *testing.T) {
+	cfg := config.DefaultConfig()
+	cfg.Presence.AlwaysActive = true
+	st := state.NewState()
+	st.GameFlowPhase = types.GameFlowInProgress
+	st.ChampionID = "Ahri"
+	st.ChampionName = "Ahri"
+
+	got := MapStateToPresence(st, cfg)
+	want := BuildAlwaysActivePresence(st, cfg)
+	if !got.Equals(want) {
+		t.Errorf("MapStateToPresence() = %+v, want %+v", got, want)
+	}
+}
+
+func TestShouldClearPresence_AlwaysActiveNeverClears(t *testing.T) {
+	cfg := config.DefaultConfig()
+	cfg.Presence.AlwaysActive = true
+	cfg.Presence.ShowInClient = false // Normally clears when idle
+	st := state.NewState()
+	st.GameFlowPhase = types.GameFlowNone
+
+	if ShouldClearPresence(st, cfg) {
+		t.Error("ShouldClearPresence() = true, want false when AlwaysActive is enabled")
 	}
 }

@@ -3,12 +3,12 @@
 version: '3'
 
 info:
-  companyName: "Haze"
-  productName: "League RPC"
-  productIdentifier: "com.its-haze.league-rpc"
+  companyName: "Arto"
+  productName: "Arto RPC"
+  productIdentifier: "com.artomoon.arto-rpc"
   description: "League of Legends Discord Rich Presence"
-  copyright: "(c) 2026, Haze"
-  comments: "https://github.com/Its-Haze/league-rpc-gui"
+  copyright: "(c) 2026, Arto"
+  comments: "https://github.com/ArtoMoon/arto-rpc"
   # Fallback for untagged local packaging; releases inject the git tag instead.
   version: "0.0.1"
 

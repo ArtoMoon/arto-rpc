@@ -1,8 +1,20 @@
 import { Eye, MessageSquareText } from "lucide-react";
-import type { TemplatePair } from "../../../bindings/github.com/its-haze/league-rpc/internal/config/models";
+import type { TemplatePair } from "../../../bindings/github.com/ArtoMoon/arto-rpc/internal/config/models";
 import { useDefaultConfig } from "../../hooks/useDefaultConfig";
 import { useSettings } from "../../hooks/useSettings";
-import { withShowEmojis, withShowInClient, withShowRank, withShowStats } from "../../lib/displayPatch";
+import {
+  withAlwaysActive,
+  withAlwaysActiveMode,
+  withAlwaysActiveChampion,
+  withAlwaysActiveGameMode,
+  withButton,
+  withCreditText,
+  withShowEmojis,
+  withShowInClient,
+  withShowRank,
+  withShowStats,
+} from "../../lib/displayPatch";
+import { POPULAR_CHAMPIONS, GAME_MODES } from "../../lib/champions";
 import { PRESENCE_CONTEXT_LABELS, PRESENCE_CONTEXTS } from "../../lib/presenceContexts";
 import { Field, SettingsCard, Tabs, Toggle } from "../ui";
 import { TemplateEditor } from "./display/TemplateEditor";
@@ -31,7 +43,7 @@ export function DisplayScreen() {
       <SettingsCard
         icon={Eye}
         title="What your status shows"
-        description="The extras League RPC adds on top of your champion and queue."
+        description="The extras Arto RPC adds on top of your champion and queue."
       >
         <Field
           id="show-rank"
@@ -88,6 +100,139 @@ export function DisplayScreen() {
             onCheckedChange={(v) => void applyPatch(withShowInClient(cfg, v))}
             label="Show presence while in client"
           />
+        </Field>
+        <Field
+          id="always-active"
+          label="Always active presence"
+          hint="Keeps status active 24/7 with a fixed status, whether in a game or not, even when League is closed"
+          onReset={defaults ? () => void applyPatch(withAlwaysActive(cfg, defaults.presence.always_active)) : undefined}
+          isDefault={!defaults || cfg.presence.always_active === defaults.presence.always_active}
+        >
+          <Toggle
+            id="always-active"
+            checked={cfg.presence.always_active}
+            onCheckedChange={(v) => void applyPatch(withAlwaysActive(cfg, v))}
+            label="Always active presence"
+          />
+        </Field>
+        {cfg.presence.always_active && (
+          <div className="bg-surface-raised border-border flex flex-col gap-3 rounded-md border p-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-text text-xs font-medium">Always Active Görünümü (Presence Type)</label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => void applyPatch(withAlwaysActiveMode(cfg, "in-client"))}
+                  className={
+                    "press rounded-sm px-3 py-1.5 text-xs font-medium transition-colors " +
+                    (cfg.presence.always_active_mode !== "in-game"
+                      ? "bg-accent text-accent-text font-semibold shadow-xs"
+                      : "bg-surface text-muted hover:text-text")
+                  }
+                >
+                  🟢 İstemcide (In Client)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void applyPatch(withAlwaysActiveMode(cfg, "in-game"))}
+                  className={
+                    "press rounded-sm px-3 py-1.5 text-xs font-medium transition-colors " +
+                    (cfg.presence.always_active_mode === "in-game"
+                      ? "bg-accent text-accent-text font-semibold shadow-xs"
+                      : "bg-surface text-muted hover:text-text")
+                  }
+                >
+                  🎮 Oyunda (Fake In-Game)
+                </button>
+              </div>
+            </div>
+
+            {cfg.presence.always_active_mode === "in-game" && (
+              <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="always-champion" className="text-text text-xs font-medium">
+                    Şampiyon (Champion)
+                  </label>
+                  <input
+                    id="always-champion"
+                    list="champions-list"
+                    type="text"
+                    value={cfg.presence.always_active_champion || "Yasuo"}
+                    onChange={(e) => void applyPatch(withAlwaysActiveChampion(cfg, e.target.value))}
+                    placeholder="Yasuo"
+                    className="border-border bg-surface text-text w-full rounded-sm border px-3 py-1.5 text-sm"
+                  />
+                  <datalist id="champions-list">
+                    {POPULAR_CHAMPIONS.map((c) => (
+                      <option key={c} value={c} />
+                    ))}
+                  </datalist>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="always-gamemode" className="text-text text-xs font-medium">
+                    Oyun Modu (Game Mode)
+                  </label>
+                  <select
+                    id="always-gamemode"
+                    value={cfg.presence.always_active_game_mode || "Ranked Solo/Duo"}
+                    onChange={(e) => void applyPatch(withAlwaysActiveGameMode(cfg, e.target.value))}
+                    className="border-border bg-surface text-text w-full rounded-sm border px-3 py-1.5 text-sm"
+                  >
+                    {GAME_MODES.map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        <Field
+          id="credit-text"
+          label="Status hover text"
+          hint="Tooltip text shown on hover over the status icon in Discord"
+          stacked
+          onReset={defaults ? () => void applyPatch(withCreditText(cfg, defaults.presence.credit_text)) : undefined}
+          isDefault={!defaults || cfg.presence.credit_text === defaults.presence.credit_text}
+        >
+          <input
+            id="credit-text"
+            type="text"
+            value={cfg.presence.credit_text}
+            onChange={(e) => void applyPatch(withCreditText(cfg, e.target.value))}
+            placeholder="ArtoMoon/arto-rpc @Github.com"
+            className="border-border bg-surface-raised text-text w-full rounded-sm border px-3 py-1.5 text-sm"
+          />
+        </Field>
+        <Field
+          id="button-url"
+          label="Discord profile button (optional)"
+          hint="Adds a clickable button with a link to your Discord profile presence"
+          stacked
+          onReset={defaults ? () => void applyPatch(withButton(cfg, defaults.presence.button_label, defaults.presence.button_url)) : undefined}
+          isDefault={!defaults || (cfg.presence.button_label === defaults.presence.button_label && cfg.presence.button_url === defaults.presence.button_url)}
+        >
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <input
+              id="button-label"
+              type="text"
+              value={cfg.presence.button_label}
+              onChange={(e) => void applyPatch(withButton(cfg, e.target.value, cfg.presence.button_url))}
+              placeholder="Button text (e.g. GitHub)"
+              className="border-border bg-surface-raised text-text w-full rounded-sm border px-3 py-1.5 text-sm"
+            />
+            <input
+              id="button-url"
+              type="text"
+              value={cfg.presence.button_url}
+              onChange={(e) => void applyPatch(withButton(cfg, cfg.presence.button_label, e.target.value))}
+              placeholder="https://..."
+              className="border-border bg-surface-raised text-text w-full rounded-sm border px-3 py-1.5 text-sm"
+            />
+          </div>
         </Field>
       </SettingsCard>
 

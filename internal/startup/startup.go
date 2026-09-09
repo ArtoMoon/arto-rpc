@@ -9,7 +9,7 @@ import (
 )
 
 // ValueName is the HKCU\...\Run entry this app owns.
-const ValueName = "LeagueRPC"
+const ValueName = "ArtoRPC"
 
 // HiddenArg is appended to the Run command. A run started by the Run entry
 // carries it and opens straight to the tray; a manual run does not.

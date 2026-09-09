@@ -54,7 +54,7 @@ func TestRun_WritesSumsAndSignature(t *testing.T) {
 	t.Setenv(signingKeyEnv, keyPEM)
 
 	dir := t.TempDir()
-	artifact := filepath.Join(dir, "league-rpc-gui.exe")
+	artifact := filepath.Join(dir, "arto-rpc-gui.exe")
 	if err := os.WriteFile(artifact, []byte("pretend-exe-bytes"), 0o644); err != nil {
 		t.Fatalf("write artifact: %v", err)
 	}
@@ -72,7 +72,7 @@ func TestRun_WritesSumsAndSignature(t *testing.T) {
 		t.Fatalf("read SHA256SUMS: %v", err)
 	}
 	wantDigest := sha256.Sum256([]byte("pretend-exe-bytes"))
-	wantLine := hex.EncodeToString(wantDigest[:]) + "  league-rpc-gui.exe\n"
+	wantLine := hex.EncodeToString(wantDigest[:]) + "  arto-rpc-gui.exe\n"
 	if string(sums) != wantLine {
 		t.Fatalf("SHA256SUMS = %q, want %q", sums, wantLine)
 	}
@@ -82,8 +82,8 @@ func TestRun_WritesSumsAndSignature(t *testing.T) {
 		t.Fatalf("read SHA256SUMS.sig: %v", err)
 	}
 	fields := strings.Fields(string(sig))
-	if len(fields) != 2 || fields[1] != "league-rpc-gui.exe" {
-		t.Fatalf("SHA256SUMS.sig = %q, want '<hex>  league-rpc-gui.exe'", sig)
+	if len(fields) != 2 || fields[1] != "arto-rpc-gui.exe" {
+		t.Fatalf("SHA256SUMS.sig = %q, want '<hex>  arto-rpc-gui.exe'", sig)
 	}
 	sigBytes, err := hex.DecodeString(fields[0])
 	if err != nil {

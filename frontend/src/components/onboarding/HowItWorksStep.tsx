@@ -1,5 +1,5 @@
 import { Bell, Info } from "lucide-react";
-import type { Config } from "../../../bindings/github.com/its-haze/league-rpc/internal/config/models";
+import type { Config } from "../../../bindings/github.com/ArtoMoon/arto-rpc/internal/config/models";
 import { howItWorksCopy } from "../../lib/howItWorks";
 
 export interface HowItWorksStepProps {
@@ -18,7 +18,7 @@ export function HowItWorksStep({ cfg }: HowItWorksStepProps) {
     <div className="flex flex-col gap-5 text-center">
       <h1 className="text-3xl font-semibold">How this works</h1>
       <p className="text-muted mx-auto max-w-2xl text-base">
-        League RPC runs in the background and follows your client. Here's the whole loop.
+        Arto RPC runs in the background and follows your client. Here's the whole loop.
       </p>
 
       <section className="border-border bg-surface flex flex-col gap-5 rounded-lg border p-6 text-left">
@@ -43,9 +43,9 @@ export function HowItWorksStep({ cfg }: HowItWorksStepProps) {
         <div className="flex flex-col gap-1">
           <h2 className="text-base font-semibold">It doesn't launch League for you</h2>
           <p className="text-muted text-sm leading-relaxed">
-            Opening League RPC won't open League. That's deliberate: it's built to start with
+            Opening Arto RPC won't open League. That's deliberate: it's built to start with
             Windows, and nobody wants League opening the moment they boot. Start League however you
-            normally do, and League RPC will pick it up.
+            normally do, and Arto RPC will pick it up.
           </p>
         </div>
       </section>

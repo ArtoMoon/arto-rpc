@@ -1,15 +1,13 @@
-import { Gamepad2, Globe, Info, Lightbulb, ShieldCheck, UserRound } from "lucide-react";
+import { Gamepad2, Info, Lightbulb, ShieldCheck, UserRound } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { GetVersion } from "../../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+import { GetVersion } from "../../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 import { useCheckForUpdates } from "../../hooks/useCheckForUpdates";
 import {
-  AUTHOR_WEBSITE_URL,
   DISCORD_COMMUNITY_URL,
-  GITHUB_PROFILE_URL,
   openExternal,
 } from "../../lib/links";
-import { DiscordIcon, GitHubIcon } from "../icons";
+import { DiscordIcon } from "../icons";
 import { Button, SettingsCard } from "../ui";
 import UpdateBanner from "../UpdateBanner";
 
@@ -28,7 +26,7 @@ export function AboutScreen() {
 
       <SettingsCard
         icon={Info}
-        title="League RPC"
+        title="Arto RPC"
         description={version ? `You're running v${version}.` : "Loading version…"}
         action={
           <>
@@ -61,7 +59,7 @@ export function AboutScreen() {
         >
           <p className="pt-1 text-sm leading-relaxed">
             Built-in detection gives you the game's name and little more: no skin, no rank, no
-            score, no way to word it yourself. League RPC fills in the rest.
+            score, no way to word it yourself. Arto RPC fills in the rest.
           </p>
         </SettingsCard>
 
@@ -71,7 +69,7 @@ export function AboutScreen() {
           description="No game files are touched, and nothing here helps you win."
         >
           <p className="pt-1 text-sm leading-relaxed">
-            League RPC reads the same local client API that Porofessor and Blitz.gg read, and turns
+            Arto RPC reads the same local client API that Porofessor and Blitz.gg read, and turns
             what it finds into a Discord status. Nothing is injected, no files are modified, and
             everything it knows is already on your own screen.
           </p>
@@ -79,15 +77,9 @@ export function AboutScreen() {
 
         <SettingsCard
           icon={UserRound}
-          title="Made by haze"
-          description="Built and maintained in my spare time, with help from everyone who files issues."
+          title="Made by ArtoMoon"
+          description="Built and maintained with love."
         >
-          <AboutLink href={AUTHOR_WEBSITE_URL} icon={<Globe className="size-4" />}>
-            My personal website
-          </AboutLink>
-          <AboutLink href={GITHUB_PROFILE_URL} icon={<GitHubIcon className="size-4" />}>
-            github.com/its-haze
-          </AboutLink>
           <AboutLink href={DISCORD_COMMUNITY_URL} icon={<DiscordIcon className="size-4" />}>
             Join the Discord community
           </AboutLink>

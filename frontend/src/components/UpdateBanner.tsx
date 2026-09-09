@@ -5,7 +5,7 @@ import {
   GetChangelog,
   RestartForUpdate,
   RetryUpdate,
-} from "../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+} from "../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 import { useUpdateStatus } from "../hooks/useUpdateStatus";
 import { handleExternalLinkClick } from "../lib/links";
 import { renderMarkdown } from "../lib/markdown";
@@ -72,7 +72,7 @@ export default function UpdateBanner() {
     <div className="border-accent bg-surface-raised flex flex-col gap-3 rounded-lg border p-4 text-sm">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <strong>League RPC {status.version}</strong> is available.
+          <strong>Arto RPC {status.version}</strong> is available.
           {restartError ? (
             <span className="text-danger ml-2">restart failed: {restartError}</span>
           ) : status.ready ? (

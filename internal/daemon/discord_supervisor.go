@@ -21,6 +21,7 @@ type DiscordSupervisor struct {
 	processNames []string
 	pollInterval time.Duration
 	league       LeagueDetector
+	alwaysActive func() bool
 	processUp    atomic.Bool
 	connected    atomic.Bool
 }
@@ -30,6 +31,7 @@ func newDiscordSupervisor(
 	connector Connector,
 	checker ProcessChecker,
 	league LeagueDetector,
+	alwaysActive func() bool,
 	retryInterval, connectPollInterval, processPollInterval time.Duration,
 	opts ...Option,
 ) *DiscordSupervisor {
@@ -38,6 +40,7 @@ func newDiscordSupervisor(
 		processNames: discordProcessNames,
 		pollInterval: processPollInterval,
 		league:       league,
+		alwaysActive: alwaysActive,
 	}
 	ds.Supervisor = NewSupervisor(&discordGatedConnector{Connector: connector, ds: ds}, retryInterval, connectPollInterval, opts...)
 
@@ -74,6 +77,9 @@ type discordGatedConnector struct {
 }
 
 func (c *discordGatedConnector) IsConnected() bool {
+	if c.ds.alwaysActive != nil && c.ds.alwaysActive() {
+		return c.Connector.IsConnected() && c.ds.processRunning()
+	}
 	return c.Connector.IsConnected() && c.ds.processRunning() && c.ds.league.LeagueProcessDetected()
 }
 

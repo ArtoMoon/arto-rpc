@@ -6,11 +6,11 @@
     "info":  {
                  "0409":  {
                               "ProductVersion":  "0.0.1",
-                              "CompanyName":  "Haze",
+                              "CompanyName":  "Arto",
                               "FileDescription":  "League of Legends Discord Rich Presence",
-                              "LegalCopyright":  "(c) 2026, Haze",
-                              "ProductName":  "League RPC",
-                              "Comments":  "https://github.com/Its-Haze/league-rpc-gui"
+                              "LegalCopyright":  "(c) 2026, Arto",
+                              "ProductName":  "Arto RPC",
+                              "Comments":  "https://github.com/ArtoMoon/arto-rpc"
                           }
              }
 }

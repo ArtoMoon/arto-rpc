@@ -1,4 +1,4 @@
-import { GetPresets } from "../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+import { GetPresets } from "../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 import { createExternalStore } from "./createExternalStore";
 
 // Presets are static for the app's lifetime, so this fetches once and shares

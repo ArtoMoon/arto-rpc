@@ -6,18 +6,18 @@
 
 <div align="center">
 
-<img src="assets/league-rpc.png" width="55%" height="auto" alt="League RPC" />
+<img src="assets/league-rpc.png" width="55%" height="auto" alt="Arto RPC" />
 
 <p>A better League of Legends Rich Presence for Discord.</p>
 
 <p>
-<a href="https://github.com/its-haze/league-rpc/releases/latest"><img alt="Downloads" src="https://img.shields.io/github/downloads/its-haze/league-rpc/total.svg?style=for-the-badge&color=A6E3A1&labelColor=11111B"></a>
-<a href="https://github.com/its-haze/league-rpc/stargazers"><img alt="Stargazers" src="https://img.shields.io/github/stars/its-haze/league-rpc.svg?style=for-the-badge&color=F9E2AF&labelColor=11111B"></a>
-<a href="https://github.com/its-haze/league-rpc/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/its-haze/league-rpc?style=for-the-badge&color=CBA6F7&labelColor=11111B"></a>
-<a href="https://github.com/its-haze/league-rpc/blob/master/LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-7F849C?style=for-the-badge&labelColor=11111B"></a>
+<a href="https://github.com/ArtoMoon/arto-rpc/releases/latest"><img alt="Downloads" src="https://img.shields.io/github/downloads/ArtoMoon/arto-rpc/total.svg?style=for-the-badge&color=A6E3A1&labelColor=11111B"></a>
+<a href="https://github.com/ArtoMoon/arto-rpc/stargazers"><img alt="Stargazers" src="https://img.shields.io/github/stars/ArtoMoon/arto-rpc.svg?style=for-the-badge&color=F9E2AF&labelColor=11111B"></a>
+<a href="https://github.com/ArtoMoon/arto-rpc/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/ArtoMoon/arto-rpc?style=for-the-badge&color=CBA6F7&labelColor=11111B"></a>
+<a href="https://github.com/ArtoMoon/arto-rpc/blob/master/LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-7F849C?style=for-the-badge&labelColor=11111B"></a>
 </p>
 
-<h3><a href="https://github.com/its-haze/league-rpc/releases/latest"><strong>Download for Windows &raquo;</strong></a></h3>
+<h3><a href="https://github.com/ArtoMoon/arto-rpc/releases/latest"><strong>Download for Windows &raquo;</strong></a></h3>
 
 <p>
 <a href="#about">About</a>
@@ -33,7 +33,7 @@
 
 ## About
 
-Welcome to League RPC. This application gives you the ability to choose how your League presence is shown on Discord.
+Welcome to Arto RPC. This application gives you the ability to choose how your League presence is shown on Discord.
 
 - **Every game mode.** Summoner's Rift, ARAM, Arena, TFT, Swarm, and more.
 - **All skins supported,** chromas and animated skins included.
@@ -41,7 +41,7 @@ Welcome to League RPC. This application gives you the ability to choose how your
 - **Customization.** You have full control over how the text is displayed on your profile.
 - **A modern GUI with a tray icon.** It keeps running in the background, so the window is only open when you want it there. It can start with Windows too.
 
-Got questions already? Don't hesitate to join the [Discord Community Server](https://discord.haze.sh)
+Got questions already? Don't hesitate to join the [Discord Community Server](https://discord.gg/uGNkFuK9cj)
 
 ⭐ If you enjoy it, don't forget to star this project! ⭐
 
@@ -59,13 +59,13 @@ Got questions already? Don't hesitate to join the [Discord Community Server](htt
 ## Installation
 
 ### 📥 Getting Started
-1. Head over to the [Releases Page](https://github.com/its-haze/league-rpc/releases)
-2. Download `league-rpc-<version>-setup.exe` from the latest release (it's under Assets)
+1. Head over to the [Releases Page](https://github.com/ArtoMoon/arto-rpc/releases)
+2. Download `arto-rpc-<version>-setup.exe` from the latest release (it's under Assets)
 3. Run it and accept the Windows security popup if it shows up
 4. Start League and Discord, in whatever order you like
 5. That's it! ✨
 
-Closing the window keeps League RPC running in your system tray. Quit from there when you want it to stop.
+Closing the window keeps Arto RPC running in your system tray. Quit from there when you want it to stop.
 
 ### 🔄 Updating
 You can update directly from the app. If you have **update notifications** enabled, you will see a notification that a new version is available.
@@ -176,8 +176,8 @@ For the cool kids who want to build it themselves:
 
 ```powershell
 # Clone and navigate
-git clone https://github.com/its-haze/league-rpc.git
-cd league-rpc
+git clone https://github.com/ArtoMoon/arto-rpc.git
+cd arto-rpc
 
 # Build
 task build
@@ -188,10 +188,10 @@ You'll need Go, Node and [Task](https://taskfile.dev/). [CONTRIBUTING.md](CONTRI
 ---
 
 ## 📞 Contact and Support
-Got questions? Join the [Discord Server](https://discord.haze.sh)
-Feel free to open up Help tickets, or contact me directly on Discord (@haze.dev).
+Got questions? Join the [Discord Server](https://discord.gg/uGNkFuK9cj)
+Feel free to open up Help tickets, or contact me directly on Discord.
 
-For issues related to the code, or project as a whole, please open an [issue on GitHub](https://github.com/its-haze/league-rpc/issues). Before you do, hit **Copy diagnostics** on the app's Help screen and paste the result in. It gathers most of what I'd otherwise have to ask you for.
+For issues related to the code, or project as a whole, please open an [issue on GitHub](https://github.com/ArtoMoon/arto-rpc/issues). Before you do, hit **Copy diagnostics** on the app's Help screen and paste the result in. It gathers most of what I'd otherwise have to ask you for.
 
 ---
 
@@ -202,10 +202,10 @@ For issues related to the code, or project as a whole, please open an [issue on 
 
 ## Star History
 
-<a href="https://star-history.com/#its-haze/league-rpc&Date">
+<a href="https://star-history.com/#ArtoMoon/arto-rpc&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=its-haze/league-rpc&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=its-haze/league-rpc&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=its-haze/league-rpc&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ArtoMoon/arto-rpc&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ArtoMoon/arto-rpc&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ArtoMoon/arto-rpc&type=Date" />
  </picture>
 </a>

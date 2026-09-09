@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/its-haze/league-rpc/internal/app"
-	"github.com/its-haze/league-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/app"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 

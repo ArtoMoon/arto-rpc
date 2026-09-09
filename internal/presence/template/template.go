@@ -20,6 +20,7 @@ const (
 	ContextInGame      Context = "in-game"
 	ContextTFTInGame   Context = "tft-in-game"
 	ContextSpectating  Context = "spectating"
+	ContextAlwaysActive Context = "always-active"
 )
 
 // emptyMark stands in for a known token that resolved to empty, so cleanup can
@@ -38,27 +39,29 @@ var (
 )
 
 var knownTokens = map[Context][]string{
-	ContextInClient:    {"emoji", "availability"},
-	ContextLobby:       {"queue", "players", "max_players"},
-	ContextCustomLobby: {"queue", "players", "max_players"},
-	ContextQueue:       {"queue"},
-	ContextChampSelect: {"queue", "mode"},
-	ContextInGame:      {"queue", "mode", "stats", "champion", "skin"},
-	ContextTFTInGame:   {"queue", "level"},
-	ContextSpectating:  {"mode", "queue"},
+	ContextInClient:     {"emoji", "availability"},
+	ContextLobby:        {"queue", "players", "max_players"},
+	ContextCustomLobby:  {"queue", "players", "max_players"},
+	ContextQueue:        {"queue"},
+	ContextChampSelect:  {"queue", "mode"},
+	ContextInGame:       {"queue", "mode", "stats", "champion", "skin"},
+	ContextTFTInGame:    {"queue", "level"},
+	ContextSpectating:   {"mode", "queue"},
+	ContextAlwaysActive: {"emoji", "availability", "mode", "queue", "champion"},
 }
 
 // defaults are the built-in templates, one [details, state] pair per context.
 // Each reproduces the string the app produced before templates were editable.
 var defaults = map[Context][2]string{
-	ContextInClient:    {"{emoji}  {availability}", "In Client"},
-	ContextLobby:       {"{queue}", "In Lobby ({players}/{max_players})"},
-	ContextCustomLobby: {"{queue}", "In Lobby"},
-	ContextQueue:       {"{queue}", "In Queue"},
-	ContextChampSelect: {"{queue}", "In Champ Select"},
-	ContextInGame:      {"{queue}", "In Game \u00b7 {stats}"},
-	ContextTFTInGame:   {"{queue}", "In Game \u00b7 lvl: {level}"},
-	ContextSpectating:  {"{mode}", "Spectating"},
+	ContextInClient:     {"{emoji}  {availability}", "In Client"},
+	ContextLobby:        {"{queue}", "In Lobby ({players}/{max_players})"},
+	ContextCustomLobby:  {"{queue}", "In Lobby"},
+	ContextQueue:        {"{queue}", "In Queue"},
+	ContextChampSelect:  {"{queue}", "In Champ Select"},
+	ContextInGame:       {"{queue}", "In Game \u00b7 {stats}"},
+	ContextTFTInGame:    {"{queue}", "In Game \u00b7 lvl: {level}"},
+	ContextSpectating:   {"{mode}", "Spectating"},
+	ContextAlwaysActive: {"{emoji}  {availability}", "In Client"},
 }
 
 var sampleData = map[Context]map[string]string{
@@ -74,15 +77,16 @@ var sampleData = map[Context]map[string]string{
 		"champion": "Cho'Gath",
 		"skin":     "Battlecast Cho'Gath",
 	},
-	ContextTFTInGame:  {"queue": "Teamfight Tactics", "level": "7"},
-	ContextSpectating: {"mode": "Howling Abyss (ARAM)", "queue": "Howling Abyss (ARAM)"},
+	ContextTFTInGame:    {"queue": "Teamfight Tactics", "level": "7"},
+	ContextSpectating:   {"mode": "Howling Abyss (ARAM)", "queue": "Howling Abyss (ARAM)"},
+	ContextAlwaysActive: {"emoji": "\U0001F7E2", "availability": "Online"},
 }
 
 // Contexts returns every context in a stable, phase-chronological order.
 func Contexts() []Context {
 	return []Context{
 		ContextInClient, ContextLobby, ContextCustomLobby, ContextQueue, ContextChampSelect,
-		ContextInGame, ContextTFTInGame, ContextSpectating,
+		ContextInGame, ContextTFTInGame, ContextSpectating, ContextAlwaysActive,
 	}
 }
 

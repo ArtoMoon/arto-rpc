@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/discord"
-	"github.com/its-haze/league-rpc/internal/state"
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/discord"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 	"github.com/rs/zerolog"
 )
 
@@ -552,4 +552,27 @@ func TestDaemon_ReportsStalledLCUAfterThreshold(t *testing.T) {
 	// A late connection clears it.
 	lcuRunner.connected.Store(true)
 	waitFor(t, testTimeout, func() bool { return !d.LCUStalled() })
+}
+
+func TestDaemon_AlwaysActiveKeepsPresenceWithoutLeague(t *testing.T) {
+	discordRunner := &fakeRunner{}
+	discordRunner.connected.Store(true)
+	lcuRunner := &fakeLCURunner{} // League closed
+	sender := &fakePresenceSender{}
+	sender.connected.Store(true)
+	cfg := config.DefaultConfig()
+	cfg.Presence.AlwaysActive = true
+	store := config.NewStore(cfg)
+	updater := discord.NewUpdater(sender, store, zerolog.Nop())
+	stateMgr := state.NewManager(zerolog.Nop())
+	d := New(discordRunner, lcuRunner, updater, stateMgr, &fakeLiveGamePoller{}, zerolog.Nop(), testPollInterval, testPollInterval)
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	go d.Run(ctx)
+
+	waitFor(t, testTimeout, func() bool { return sender.sendCount() > 0 })
+	if sender.clearCount() != 0 {
+		t.Errorf("ClearPresence() called %d times, want 0 when AlwaysActive", sender.clearCount())
+	}
 }

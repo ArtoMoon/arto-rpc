@@ -5,19 +5,19 @@
 !include "FileFunc.nsh"
 
 !ifndef INFO_PROJECTNAME
-    !define INFO_PROJECTNAME "league-rpc"
+    !define INFO_PROJECTNAME "arto-rpc"
 !endif
 !ifndef INFO_COMPANYNAME
-    !define INFO_COMPANYNAME "Haze"
+    !define INFO_COMPANYNAME "Arto"
 !endif
 !ifndef INFO_PRODUCTNAME
-    !define INFO_PRODUCTNAME "League RPC"
+    !define INFO_PRODUCTNAME "Arto RPC"
 !endif
 !ifndef INFO_PRODUCTVERSION
     !define INFO_PRODUCTVERSION "0.0.1"
 !endif
 !ifndef INFO_COPYRIGHT
-    !define INFO_COPYRIGHT "(c) 2026, Haze"
+    !define INFO_COPYRIGHT "(c) 2026, Arto"
 !endif
 !ifndef PRODUCT_EXECUTABLE
     !define PRODUCT_EXECUTABLE "${INFO_PROJECTNAME}.exe"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 )
 
 const (
@@ -12,8 +12,8 @@ const (
 	communityDragonBaseURL = "https://raw.communitydragon.org/latest"
 	datadragonBaseURL      = "https://ddragon.leagueoflegends.com/cdn"
 	githubAssetsBaseURL    = "https://github.com/Its-Haze/league-assets/blob/master"
-	leagueLogoURL          = "https://github.com/Its-Haze/league-rpc/blob/master/assets/league-classic-borderless.jpg?raw=true"
-	leagueLogoLargeURL     = "https://github.com/Its-Haze/league-rpc/blob/master/assets/leagueoflegends.png?raw=true"
+	leagueLogoURL          = "https://github.com/ArtoMoon/arto-rpc/blob/master/assets/league-classic-borderless.jpg?raw=true"
+	leagueLogoLargeURL     = "https://github.com/ArtoMoon/arto-rpc/blob/master/assets/leagueoflegends.png?raw=true"
 	tftCompanionsBaseURL   = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets"
 )
 

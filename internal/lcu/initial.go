@@ -9,10 +9,10 @@ import (
 	"time"
 
 	lcu "github.com/its-haze/lcu-gopher"
-	"github.com/its-haze/league-rpc/internal/discord"
-	"github.com/its-haze/league-rpc/internal/state"
-	"github.com/its-haze/league-rpc/pkg/constants"
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/internal/discord"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/pkg/constants"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 )
 
 // gatherInitialData fetches all initial state from LCU when first connecting.

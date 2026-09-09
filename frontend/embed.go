@@ -1,4 +1,4 @@
-// Package frontend embeds the built Wails GUI assets so cmd/league-rpc-gui can
+// Package frontend embeds the built Wails GUI assets so cmd/arto-rpc-gui can
 package frontend
 
 import (

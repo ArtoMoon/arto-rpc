@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
 	"github.com/rs/zerolog"
 )
 
@@ -116,6 +116,11 @@ func NewUpdater(client presenceSender, store *config.Store, logger zerolog.Logge
 // re-send presence at once instead of waiting for the next poll tick.
 func (u *Updater) ConfigChanges() <-chan *config.Config {
 	return u.store.Subscribe()
+}
+
+// Config returns the current config from the store.
+func (u *Updater) Config() *config.Config {
+	return u.store.Load()
 }
 
 // Run drives the heartbeat/reclaim ticker until ctx is canceled. Daemon

@@ -278,8 +278,8 @@ func TestRenderPair_DedupesUnknownAcrossLines(t *testing.T) {
 }
 
 func TestContextsAndKnownTokens(t *testing.T) {
-	if len(Contexts()) != 8 {
-		t.Fatalf("Contexts() = %v, want 8", Contexts())
+	if len(Contexts()) != 9 {
+		t.Fatalf("Contexts() = %v, want 9", Contexts())
 	}
 	for _, ctx := range Contexts() {
 		if !IsContext(ctx) {

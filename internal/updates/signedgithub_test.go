@@ -16,9 +16,9 @@ import (
 )
 
 func TestParseSignatureLine(t *testing.T) {
-	body := "# comment\ndeadbeef  other.exe\ncafebabe  league-rpc-gui.exe\n"
+	body := "# comment\ndeadbeef  other.exe\ncafebabe  arto-rpc-gui.exe\n"
 
-	got, err := parseSignatureLine(body, "league-rpc-gui.exe")
+	got, err := parseSignatureLine(body, "arto-rpc-gui.exe")
 	if err != nil {
 		t.Fatalf("parseSignatureLine: %v", err)
 	}
@@ -38,7 +38,7 @@ func checksumsFile(digest []byte, filename string) string {
 }
 
 func TestSignedProvider_AttachesSignature(t *testing.T) {
-	const artifactName = "league-rpc-gui.exe"
+	const artifactName = "arto-rpc-gui.exe"
 	artifactBytes := []byte("pretend-exe-bytes")
 	digest := sha256.Sum256(artifactBytes)
 
@@ -108,7 +108,7 @@ func TestSignedProvider_AttachesSignature(t *testing.T) {
 }
 
 func TestSignedProvider_NoSidecarLeavesDigestOnly(t *testing.T) {
-	const artifactName = "league-rpc-gui.exe"
+	const artifactName = "arto-rpc-gui.exe"
 	artifactBytes := []byte("pretend-exe-bytes")
 	digest := sha256.Sum256(artifactBytes)
 

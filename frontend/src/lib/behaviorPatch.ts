@@ -1,4 +1,4 @@
-import type { Config } from "../../bindings/github.com/its-haze/league-rpc/internal/config/models";
+import type { Config } from "../../bindings/github.com/ArtoMoon/arto-rpc/internal/config/models";
 
 // Pure patch builders for the Behavior screen's toggles, each returning the
 // Partial<Config> useSettings().applyPatch expects.

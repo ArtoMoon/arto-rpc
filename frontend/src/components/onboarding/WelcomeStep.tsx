@@ -31,7 +31,7 @@ const HIGHLIGHTS = [
 export function WelcomeStep() {
   return (
     <div className="flex flex-col gap-5 text-center">
-      <h1 className="text-3xl font-semibold">Welcome to League RPC</h1>
+      <h1 className="text-3xl font-semibold">Welcome to Arto RPC</h1>
       <p className="text-muted mx-auto max-w-2xl text-base">
         Your League games, on your Discord profile. Set it up once here, and it takes care of
         itself from then on.

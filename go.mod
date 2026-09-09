@@ -1,4 +1,4 @@
-module github.com/its-haze/league-rpc
+module github.com/ArtoMoon/arto-rpc
 
 go 1.25.0
 

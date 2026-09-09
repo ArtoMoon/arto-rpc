@@ -1,13 +1,13 @@
 package daemon
 
 import (
-	"github.com/its-haze/league-rpc/internal/championdata"
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/discord"
-	"github.com/its-haze/league-rpc/internal/lcu"
-	"github.com/its-haze/league-rpc/internal/livegame"
-	"github.com/its-haze/league-rpc/internal/process"
-	"github.com/its-haze/league-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/internal/championdata"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/discord"
+	"github.com/ArtoMoon/arto-rpc/internal/lcu"
+	"github.com/ArtoMoon/arto-rpc/internal/livegame"
+	"github.com/ArtoMoon/arto-rpc/internal/process"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
 	"github.com/rs/zerolog"
 )
 
@@ -22,7 +22,10 @@ func Wire(store *config.Store, logger zerolog.Logger) *Daemon {
 	checker := process.NewChecker()
 
 	lcuSup := NewLeagueSupervisor(lcuClient, checker)
-	discordSup := NewDiscordSupervisor(discordClient, checker, lcuSup)
+	alwaysActive := func() bool {
+		return store.Load().Presence.AlwaysActive
+	}
+	discordSup := NewDiscordSupervisor(discordClient, checker, lcuSup, alwaysActive)
 
 	championResolver := championdata.NewResolver(championdata.NewProductionHTTPDoer())
 	liveGamePoller := livegame.NewPoller(liveGameClient, championResolver, stateMgr, store, logger)

@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/discord"
-	"github.com/its-haze/league-rpc/internal/logging"
-	"github.com/its-haze/league-rpc/internal/presence/template"
-	"github.com/its-haze/league-rpc/internal/state"
-	"github.com/its-haze/league-rpc/internal/version"
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/discord"
+	"github.com/ArtoMoon/arto-rpc/internal/logging"
+	"github.com/ArtoMoon/arto-rpc/internal/presence/template"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/internal/version"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 )
 
 // Pauser is the runtime pause control the daemon exposes. Kept as a local

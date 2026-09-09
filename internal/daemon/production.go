@@ -3,9 +3,9 @@ package daemon
 import (
 	"time"
 
-	"github.com/its-haze/league-rpc/internal/discord"
-	"github.com/its-haze/league-rpc/internal/lcu"
-	"github.com/its-haze/league-rpc/internal/livegame"
+	"github.com/ArtoMoon/arto-rpc/internal/discord"
+	"github.com/ArtoMoon/arto-rpc/internal/lcu"
+	"github.com/ArtoMoon/arto-rpc/internal/livegame"
 )
 
 // Compile-time checks that the real clients satisfy Connector.
@@ -30,12 +30,17 @@ const (
 
 // discordGate is a Gate that waits for League's process and Discord's
 // process to both be running before allowing a connect attempt. See ADR-0003.
+// When alwaysActive reports true, it only waits for Discord's process.
 type discordGate struct {
-	checker ProcessChecker
-	league  LeagueDetector
+	checker      ProcessChecker
+	league       LeagueDetector
+	alwaysActive func() bool
 }
 
 func (g *discordGate) Ready() (bool, error) {
+	if g.alwaysActive != nil && g.alwaysActive() {
+		return g.checker.IsRunning(discordProcessNames...)
+	}
 	if !g.league.LeagueProcessDetected() {
 		return false, nil
 	}
@@ -44,9 +49,9 @@ func (g *discordGate) Ready() (bool, error) {
 
 // NewDiscordSupervisor builds the production Discord Connection Supervisor.
 // league is typically the already-built LCUSupervisor.
-func NewDiscordSupervisor(client *discord.Client, checker ProcessChecker, league LeagueDetector) *DiscordSupervisor {
-	return newDiscordSupervisor(client, checker, league, DefaultRetryInterval, DefaultConnectPollInterval, DefaultProcessPollInterval,
-		WithGate(&discordGate{checker: checker, league: league}))
+func NewDiscordSupervisor(client *discord.Client, checker ProcessChecker, league LeagueDetector, alwaysActive func() bool) *DiscordSupervisor {
+	return newDiscordSupervisor(client, checker, league, alwaysActive, DefaultRetryInterval, DefaultConnectPollInterval, DefaultProcessPollInterval,
+		WithGate(&discordGate{checker: checker, league: league, alwaysActive: alwaysActive}))
 }
 
 // NewLeagueSupervisor builds the production LCU Connection Supervisor.

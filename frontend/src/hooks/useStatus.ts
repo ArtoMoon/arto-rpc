@@ -1,6 +1,6 @@
 import { Events } from "@wailsio/runtime";
-import { GetStatus } from "../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
-import type { StatusSnapshot } from "../../bindings/github.com/its-haze/league-rpc/internal/app/models";
+import { GetStatus } from "../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
+import type { StatusSnapshot } from "../../bindings/github.com/ArtoMoon/arto-rpc/internal/app/models";
 import { createExternalStore } from "./createExternalStore";
 
 const STATUS_CHANGED_EVENT = "status:changed";

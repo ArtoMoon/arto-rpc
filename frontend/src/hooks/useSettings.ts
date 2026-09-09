@@ -3,8 +3,8 @@ import { Events } from "@wailsio/runtime";
 import {
   ApplySettings,
   GetSettings,
-} from "../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
-import type { Config } from "../../bindings/github.com/its-haze/league-rpc/internal/config/models";
+} from "../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
+import type { Config } from "../../bindings/github.com/ArtoMoon/arto-rpc/internal/config/models";
 import { createExternalStore } from "./createExternalStore";
 
 const CONFIG_CHANGED_EVENT = "settings:changed";

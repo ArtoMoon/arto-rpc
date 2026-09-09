@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ResolveClose } from "../../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+import { ResolveClose } from "../../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 import { useSettings } from "../../hooks/useSettings";
 import { withCloseAction, type CloseAction } from "../../lib/behaviorPatch";
 import { Button, Dialog } from "../ui";
@@ -31,7 +31,7 @@ export function CloseConfirmDialog({ open, onDismiss }: CloseConfirmDialogProps)
     <Dialog
       open={open}
       onOpenChange={(next) => !next && dismiss()}
-      title="Close League RPC?"
+      title="Close Arto RPC?"
       description="Presence keeps updating while the window is hidden. Quitting stops it until you launch the app again."
     >
       <label className="text-muted flex items-center gap-2 text-sm">

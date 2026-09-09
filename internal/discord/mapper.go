@@ -1,9 +1,9 @@
 package discord
 
 import (
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/state"
-	"github.com/its-haze/league-rpc/pkg/types"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/pkg/types"
 )
 
 // MapStateToPresence converts application state to Discord RPC data
@@ -11,6 +11,10 @@ import (
 func MapStateToPresence(st *state.State, cfg *config.Config) *RPCData {
 	if st == nil {
 		return &RPCData{}
+	}
+
+	if cfg != nil && cfg.Presence.AlwaysActive {
+		return BuildAlwaysActivePresence(st, cfg)
 	}
 
 	// Route to appropriate builder based on game flow phase
@@ -63,6 +67,9 @@ func MapStateToPresence(st *state.State, cfg *config.Config) *RPCData {
 // ShouldClearPresence returns true if presence should be cleared instead of updated
 // This happens when the user has --hide-in-client enabled and is idle
 func ShouldClearPresence(st *state.State, cfg *config.Config) bool {
+	if cfg != nil && cfg.Presence.AlwaysActive {
+		return false
+	}
 	if !cfg.Presence.ShowInClient && st.GameFlowPhase.IsInClient() {
 		return true
 	}

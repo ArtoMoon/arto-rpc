@@ -1,8 +1,8 @@
 package discord
 
 import (
-	"github.com/its-haze/league-rpc/internal/config"
-	"github.com/its-haze/league-rpc/internal/presence/template"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/presence/template"
 )
 
 // renderPresenceText renders ctx's details and state through the template

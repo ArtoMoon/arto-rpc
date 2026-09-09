@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/its-haze/league-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
 	"github.com/rs/zerolog"
 )
 

@@ -24,7 +24,7 @@ func TestDiscordSupervisor_DetectsDisconnectWhenDiscordProcessDisappears(t *test
 
 	var connectCount atomic.Int32
 	// Gate mirrors production wiring: Connect() only fires while both are up.
-	ds := newDiscordSupervisor(connector, checker, league, testRetryInterval, testPollInterval, testPollInterval,
+	ds := newDiscordSupervisor(connector, checker, league, nil, testRetryInterval, testPollInterval, testPollInterval,
 		WithGate(&discordGate{checker: checker, league: league}),
 		WithOnConnect(func() { connectCount.Add(1) }))
 
@@ -52,7 +52,7 @@ func TestDiscordSupervisor_NeverConnectsWhileLeagueNotDetected(t *testing.T) {
 	checker := &fakeProcessChecker{running: true}
 	league := &fakeLeagueDetector{} // League not running
 
-	ds := newDiscordSupervisor(connector, checker, league, testRetryInterval, testPollInterval, testPollInterval,
+	ds := newDiscordSupervisor(connector, checker, league, nil, testRetryInterval, testPollInterval, testPollInterval,
 		WithGate(&discordGate{checker: checker, league: league}))
 
 	ctx, cancel := context.WithCancel(t.Context())
@@ -77,7 +77,7 @@ func TestDiscordSupervisor_DisconnectsWhenLeagueProcessDisappears(t *testing.T) 
 	league.detected.Store(true)
 
 	var disconnectCount atomic.Int32
-	ds := newDiscordSupervisor(connector, checker, league, testRetryInterval, testPollInterval, testPollInterval,
+	ds := newDiscordSupervisor(connector, checker, league, nil, testRetryInterval, testPollInterval, testPollInterval,
 		WithGate(&discordGate{checker: checker, league: league}),
 		WithOnDisconnect(func() { disconnectCount.Add(1) }))
 
@@ -101,7 +101,7 @@ func TestDiscordSupervisor_ChecksErrorLeavesLastKnownState(t *testing.T) {
 	league := &fakeLeagueDetector{}
 	league.detected.Store(true)
 
-	ds := newDiscordSupervisor(connector, checker, league, testRetryInterval, testPollInterval, testPollInterval)
+	ds := newDiscordSupervisor(connector, checker, league, nil, testRetryInterval, testPollInterval, testPollInterval)
 
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
@@ -111,4 +111,20 @@ func TestDiscordSupervisor_ChecksErrorLeavesLastKnownState(t *testing.T) {
 
 	checker.err = errors.New("boom")
 	waitFor(t, testTimeout, ds.Connected) // stays connected across transient checker errors
+}
+
+func TestDiscordSupervisor_ConnectsWhenAlwaysActiveEvenWithoutLeague(t *testing.T) {
+	connector := &fakeConnector{}
+	checker := &fakeProcessChecker{running: true}
+	league := &fakeLeagueDetector{} // League not running
+	alwaysActive := func() bool { return true }
+
+	ds := newDiscordSupervisor(connector, checker, league, alwaysActive, testRetryInterval, testPollInterval, testPollInterval,
+		WithGate(&discordGate{checker: checker, league: league, alwaysActive: alwaysActive}))
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	go ds.Run(ctx)
+
+	waitFor(t, testTimeout, ds.Connected)
 }

@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	"github.com/its-haze/league-rpc/internal/app"
-	"github.com/its-haze/league-rpc/internal/config"
+	"github.com/ArtoMoon/arto-rpc/internal/app"
+	"github.com/ArtoMoon/arto-rpc/internal/config"
 )
 
 func TestGUIService_SettingsRoundTrip(t *testing.T) {

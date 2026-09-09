@@ -21,8 +21,8 @@ export function howItWorksCopy({ launchAtStartup, notifyUpdates }: HowItWorksInp
       {
         title: "It starts",
         body: launchAtStartup
-          ? "League RPC starts with Windows, minimized to the tray. You don't have to do anything."
-          : "You start League RPC yourself. Any time works: before League, after League, or mid-game. It catches up either way.",
+          ? "Arto RPC starts with Windows, minimized to the tray. You don't have to do anything."
+          : "You start Arto RPC yourself. Any time works: before League, after League, or mid-game. It catches up either way.",
       },
       {
         title: "It waits",

@@ -1,6 +1,6 @@
 package main
 
-import "github.com/its-haze/league-rpc/internal/config"
+import "github.com/ArtoMoon/arto-rpc/internal/config"
 
 // windowController is the subset of the Wails window the tray drives. An
 // adapter over *application.WebviewWindow satisfies it; tests use a fake.

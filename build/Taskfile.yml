@@ -188,7 +188,7 @@ tasks:
     generates:
       - frontend/bindings/**/*
     cmds:
-      # Scan the whole module: the bound service lives in cmd/league-rpc-gui,
+      # Scan the whole module: the bound service lives in cmd/arto-rpc-gui,
       # not the (empty) repo-root package the tool defaults to.
       - wails3 generate bindings -f '{{.BUILD_FLAGS}}' -clean=true{{if eq .OBFUSCATED "true"}} -obfuscated{{end}} -ts -i ./...
 

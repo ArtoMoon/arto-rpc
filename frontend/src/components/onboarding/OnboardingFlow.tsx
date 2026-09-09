@@ -1,5 +1,5 @@
 import { useReducer } from "react";
-import type { Config } from "../../../bindings/github.com/its-haze/league-rpc/internal/config/models";
+import type { Config } from "../../../bindings/github.com/ArtoMoon/arto-rpc/internal/config/models";
 import { initialOnboarding, isFirstStep, isLastStep, onboardingReducer } from "../../lib/onboarding";
 import { Button } from "../ui";
 import { ClosingStep } from "./ClosingStep";

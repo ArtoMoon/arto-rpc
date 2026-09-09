@@ -1,5 +1,5 @@
-import { GetPreviewAssets } from "../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
-import type { PreviewAssets } from "../../bindings/github.com/its-haze/league-rpc/internal/app/models";
+import { GetPreviewAssets } from "../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
+import type { PreviewAssets } from "../../bindings/github.com/ArtoMoon/arto-rpc/internal/app/models";
 import { createExternalStore } from "./createExternalStore";
 
 // Static for the app's lifetime, so fetched once and shared, same reasoning

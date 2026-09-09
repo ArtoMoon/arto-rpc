@@ -1,10 +1,10 @@
 version: '3'
 
 vars:
-  APP_NAME: "league-rpc"
+  APP_NAME: "arto-rpc"
   # The Go package that produces the GUI binary. The daemon-only build in
-  # cmd/league-rpc is not a shipped artifact and is built directly with `go`.
-  MAIN_PACKAGE: "./cmd/league-rpc-gui"
+  # cmd/arto-rpc is not a shipped artifact and is built directly with `go`.
+  MAIN_PACKAGE: "./cmd/arto-rpc-gui"
   BIN_DIR: "bin"
   PACKAGE_MANAGER: '{{.PACKAGE_MANAGER | default "npm"}}'
   VITE_PORT: '{{.WAILS_VITE_PORT | default 9245}}'

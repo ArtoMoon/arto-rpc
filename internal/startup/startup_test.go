@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-const testExe = `C:\Apps\league-rpc-gui.exe`
+const testExe = `C:\Apps\arto-rpc-gui.exe`
 
 // fakeRunKey stands in for the HKCU Run key. No real registry is touched.
 type fakeRunKey struct {
@@ -165,8 +165,8 @@ func TestStartedHidden(t *testing.T) {
 }
 
 func TestCommand(t *testing.T) {
-	got := Command(`C:\Program Files\league-rpc\app.exe`)
-	want := `"C:\Program Files\league-rpc\app.exe" --hidden`
+	got := Command(`C:\Program Files\arto-rpc\app.exe`)
+	want := `"C:\Program Files\arto-rpc\app.exe" --hidden`
 	if got != want {
 		t.Fatalf("Command() = %q, want %q", got, want)
 	}

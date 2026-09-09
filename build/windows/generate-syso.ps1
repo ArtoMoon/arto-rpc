@@ -17,7 +17,7 @@ if ($version) {
     $info.fixed.product_version = $version
     $info.info.'0409'.ProductVersion = $version
 
-    $infoPath = Join-Path $env:TEMP ('league-rpc-info-' + [guid]::NewGuid() + '.json')
+    $infoPath = Join-Path $env:TEMP ('arto-rpc-info-' + [guid]::NewGuid() + '.json')
     [IO.File]::WriteAllText($infoPath, ($info | ConvertTo-Json -Depth 10), (New-Object Text.UTF8Encoding $false))
 }
 

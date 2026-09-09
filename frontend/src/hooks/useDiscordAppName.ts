@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GetApplicationName } from "../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+import { GetApplicationName } from "../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 
 // Cached by id across every caller: Home and Advanced can both be resolving
 // the same app id at once, and the id rarely changes.

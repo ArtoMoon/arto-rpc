@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Events } from "@wailsio/runtime";
-import { GetRecentLogs } from "../../../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+import { GetRecentLogs } from "../../../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 import { appendLines, isScrolledToBottom } from "../../../lib/logTail";
 
 const LOG_LINE_EVENT = "log:line";

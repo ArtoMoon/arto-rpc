@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckForUpdates } from "../../bindings/github.com/its-haze/league-rpc/cmd/league-rpc-gui/guiservice";
+import { CheckForUpdates } from "../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 
 export interface UseCheckForUpdatesResult {
   checking: boolean;

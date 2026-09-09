@@ -124,7 +124,7 @@ export function AdvancedScreen() {
       <SettingsCard
         icon={Gauge}
         title="Update speed"
-        description="How often League RPC refreshes what Discord shows. Faster feels more live, slower is lighter on your PC."
+        description="How often Arto RPC refreshes what Discord shows. Faster feels more live, slower is lighter on your PC."
       >
         <div className="flex flex-col gap-4 pt-1">
           <IntervalSlider

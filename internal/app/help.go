@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/its-haze/league-rpc/internal/logging"
+	"github.com/ArtoMoon/arto-rpc/internal/logging"
 )
 
 // WithLogs wires the in-memory log ring and the logs directory so the Help
@@ -64,7 +64,7 @@ func (a *App) GetDiagnostics() string {
 	}
 
 	return fmt.Sprintf(
-		"League RPC diagnostics\n"+
+		"Arto RPC diagnostics\n"+
 			"- Version: %s\n"+
 			"- OS: %s/%s\n"+
 			"- League process: %v\n"+

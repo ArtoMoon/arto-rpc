@@ -9,13 +9,13 @@ import (
 
 const (
 	// AppName is the application name used for config directory
-	AppName = "league-rpc"
+	AppName = "arto-rpc"
 	// ConfigFileName is the name of the configuration file
 	ConfigFileName = "config.json"
 )
 
 // GetConfigDir returns the configuration directory path
-// Windows: %APPDATA%\league-rpc
+// Windows: %APPDATA%\arto-rpc
 func GetConfigDir() (string, error) {
 	appData := os.Getenv("APPDATA")
 	if appData == "" {

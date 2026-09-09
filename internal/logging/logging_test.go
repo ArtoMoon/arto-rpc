@@ -24,7 +24,7 @@ func TestNew_FansOutToFileAndRing(t *testing.T) {
 		t.Fatalf("ring missing the line: %v", lines)
 	}
 
-	logPath := filepath.Join(dir, "league-rpc", "logs", LogFileName)
+	logPath := filepath.Join(dir, "arto-rpc", "logs", LogFileName)
 	data, err := os.ReadFile(logPath)
 	if err != nil {
 		t.Fatalf("reading log file: %v", err)
