@@ -3,6 +3,7 @@ package config
 import (
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 // Store holds the live configuration. Readers call Load for a lock-free
@@ -38,6 +39,15 @@ func (s *Store) Subscribe() <-chan *Config {
 // Apply validates next, writes it to disk, then swaps it in and notifies
 // subscribers. On a validation or write error nothing changes.
 func (s *Store) Apply(next Config) error {
+	cur := s.cur.Load()
+	if cur != nil && cur.Presence.AlwaysActiveChampion != next.Presence.AlwaysActiveChampion && next.Presence.AlwaysActiveChampion != "" {
+		if next.Presence.AlwaysActiveStartTime == cur.Presence.AlwaysActiveStartTime {
+			next.Presence.AlwaysActiveStartTime = time.Now().Unix()
+			next.Presence.AlwaysActiveTimerStopped = false
+			next.Presence.AlwaysActivePausedDuration = 0
+		}
+	}
+
 	if err := next.Validate(); err != nil {
 		return err
 	}

@@ -42,12 +42,15 @@ type PresenceConfig struct {
 	ShowInClient bool                    `json:"show_in_client"` // presence while idle in client
 	AlwaysActive         bool                    `json:"always_active"`          // keep presence active 24/7 with the static presence
 	AlwaysActiveMode     string                  `json:"always_active_mode"`     // in-client | in-game
-	AlwaysActiveChampion string                  `json:"always_active_champion"` // fake in-game champion (e.g. Yasuo)
-	AlwaysActiveGameMode string                  `json:"always_active_game_mode"` // fake in-game mode (e.g. Ranked Solo/Duo)
-	CreditText           string                  `json:"credit_text"`            // custom text shown on hover (default: ArtoMoon/arto-rpc @Github.com)
-	ButtonLabel          string                  `json:"button_label"`           // optional Discord button label
-	ButtonURL            string                  `json:"button_url"`             // optional Discord button URL
-	Templates            map[string]TemplatePair `json:"templates"`              // per-context text, keyed by context
+	AlwaysActiveChampion     string                  `json:"always_active_champion"`      // fake in-game champion (e.g. Yasuo)
+	AlwaysActiveGameMode     string                  `json:"always_active_game_mode"`      // fake in-game mode (e.g. Ranked Solo/Duo)
+	AlwaysActiveStartTime      int64                   `json:"always_active_start_time"`       // fake in-game start timestamp (unix seconds)
+	AlwaysActiveTimerStopped   bool                    `json:"always_active_timer_stopped"`    // whether fake in-game timer is stopped
+	AlwaysActivePausedDuration int64                   `json:"always_active_paused_duration"` // fake in-game paused duration in seconds
+	CreditText                 string                  `json:"credit_text"`                    // custom text shown on hover (default: ArtoMoon/arto-rpc @Github.com)
+	ButtonLabel                string                  `json:"button_label"`                   // optional Discord button label
+	ButtonURL                  string                  `json:"button_url"`                     // optional Discord button URL
+	Templates                  map[string]TemplatePair `json:"templates"`                      // per-context text, keyed by context
 }
 
 // TemplatePair is the editable text for one presence context: the two lines
@@ -90,13 +93,16 @@ func DefaultConfig() *Config {
 			Default: DisplayDefaults{ShowRank: true, ShowStats: true},
 		},
 		Presence: PresenceConfig{
-			ShowEmojis:   true,
-			ShowInClient: true,
-			AlwaysActive:         false,
-			AlwaysActiveMode:     "in-client",
-			AlwaysActiveChampion: "Yasuo",
-			AlwaysActiveGameMode: "Ranked Solo/Duo",
-			CreditText:           "",
+			ShowEmojis:                 true,
+			ShowInClient:               true,
+			AlwaysActive:               false,
+			AlwaysActiveMode:           "in-client",
+			AlwaysActiveChampion:       "Yasuo",
+			AlwaysActiveGameMode:       "Ranked Solo/Duo",
+			AlwaysActiveStartTime:      0,
+			AlwaysActiveTimerStopped:   false,
+			AlwaysActivePausedDuration: 0,
+			CreditText:                 "",
 			ButtonLabel:  "",
 			ButtonURL:    "",
 			Templates:    defaultTemplates(),

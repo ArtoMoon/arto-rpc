@@ -1,4 +1,5 @@
-import { Eye, MessageSquareText } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Eye, MessageSquareText, Pause, Play, RotateCcw } from "lucide-react";
 import type { TemplatePair } from "../../../bindings/github.com/ArtoMoon/arto-rpc/internal/config/models";
 import { useDefaultConfig } from "../../hooks/useDefaultConfig";
 import { useSettings } from "../../hooks/useSettings";
@@ -7,6 +8,8 @@ import {
   withAlwaysActiveMode,
   withAlwaysActiveChampion,
   withAlwaysActiveGameMode,
+  withAlwaysActiveTimerStopped,
+  withResetAlwaysActiveTimer,
   withButton,
   withCreditText,
   withShowEmojis,
@@ -19,14 +22,63 @@ import { PRESENCE_CONTEXT_LABELS, PRESENCE_CONTEXTS } from "../../lib/presenceCo
 import { Field, SettingsCard, Tabs, Toggle } from "../ui";
 import { TemplateEditor } from "./display/TemplateEditor";
 
+function formatElapsed(totalSec: number): string {
+  const sec = Math.max(0, Math.floor(totalSec));
+  const hours = Math.floor(sec / 3600);
+  const minutes = Math.floor((sec % 3600) / 60);
+  const seconds = sec % 60;
+  const mm = String(minutes).padStart(2, "0");
+  const ss = String(seconds).padStart(2, "0");
+  if (hours > 0) {
+    return `${hours}:${mm}:${ss}`;
+  }
+  return `${mm}:${ss}`;
+}
+
 // The Display section: global toggles, and one tab per presence context so
 // the four text editors don't all show at once.
 export function DisplayScreen() {
   const { cfg, error, applyPatch } = useSettings();
   const defaults = useDefaultConfig();
+  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+  // Local champion input state — avoids the controlled-input flicker where every
+  // keystroke round-trips through the backend and resets the cursor position.
+  const [localChampion, setLocalChampion] = useState<string | null>(null);
+  const championInputRef = useRef<HTMLInputElement>(null);
+
+  const isFakeInGame = Boolean(
+    cfg?.presence.always_active && cfg?.presence.always_active_mode === "in-game"
+  );
+  const isStopped = Boolean(cfg?.presence.always_active_timer_stopped);
+  const startTime = cfg?.presence.always_active_start_time || now;
+  const pausedDuration = cfg?.presence.always_active_paused_duration || 0;
+
+  const currentElapsed = isStopped
+    ? pausedDuration
+    : Math.max(0, now - startTime);
+
+  useEffect(() => {
+    if (!isFakeInGame || isStopped) return;
+
+    const timer = setInterval(() => {
+      setNow(Math.floor(Date.now() / 1000));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isFakeInGame, isStopped]);
 
   if (!cfg) {
     return <p className="text-muted text-sm">Loading settings…</p>;
+  }
+
+  function handleToggleTimer() {
+    if (!cfg) return;
+    void applyPatch(withAlwaysActiveTimerStopped(cfg, !isStopped, currentElapsed));
+  }
+
+  function handleResetTimer() {
+    if (!cfg) return;
+    void applyPatch(withResetAlwaysActiveTimer(cfg));
   }
 
   function setTemplate(ctx: string, next: TemplatePair) {
@@ -148,43 +200,116 @@ export function DisplayScreen() {
             </div>
 
             {cfg.presence.always_active_mode === "in-game" && (
-              <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2">
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="always-champion" className="text-text text-xs font-medium">
-                    Şampiyon (Champion)
-                  </label>
-                  <input
-                    id="always-champion"
-                    list="champions-list"
-                    type="text"
-                    value={cfg.presence.always_active_champion || "Yasuo"}
-                    onChange={(e) => void applyPatch(withAlwaysActiveChampion(cfg, e.target.value))}
-                    placeholder="Yasuo"
-                    className="border-border bg-surface text-text w-full rounded-sm border px-3 py-1.5 text-sm"
-                  />
-                  <datalist id="champions-list">
-                    {POPULAR_CHAMPIONS.map((c) => (
-                      <option key={c} value={c} />
-                    ))}
-                  </datalist>
+              <div className="flex flex-col gap-3 pt-1">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="always-champion" className="text-text text-xs font-medium">
+                      Şampiyon (Champion)
+                    </label>
+                    <input
+                      ref={championInputRef}
+                      id="always-champion"
+                      list="champions-list"
+                      type="text"
+                      value={localChampion ?? cfg.presence.always_active_champion ?? ""}
+                      placeholder="Yasuo"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setLocalChampion(val);
+                        // When the user picks from the datalist the browser fires a
+                        // change event whose value exactly matches one of the options.
+                        if (POPULAR_CHAMPIONS.includes(val)) {
+                          void applyPatch(withAlwaysActiveChampion(cfg, val));
+                          setLocalChampion(null);
+                        }
+                      }}
+                      onBlur={() => {
+                        if (localChampion !== null) {
+                          void applyPatch(withAlwaysActiveChampion(cfg, localChampion));
+                          setLocalChampion(null);
+                        }
+                      }}
+                      className="border-border bg-surface text-text w-full rounded-sm border px-3 py-1.5 text-sm"
+                    />
+                    <datalist id="champions-list">
+                      {POPULAR_CHAMPIONS.map((c) => (
+                        <option key={c} value={c} />
+                      ))}
+                    </datalist>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="always-gamemode" className="text-text text-xs font-medium">
+                      Oyun Modu (Game Mode)
+                    </label>
+                    <select
+                      id="always-gamemode"
+                      value={cfg.presence.always_active_game_mode || "Ranked Solo/Duo"}
+                      onChange={(e) => void applyPatch(withAlwaysActiveGameMode(cfg, e.target.value))}
+                      className="border-border bg-surface text-text w-full rounded-sm border px-3 py-1.5 text-sm"
+                    >
+                      {GAME_MODES.map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="always-gamemode" className="text-text text-xs font-medium">
-                    Oyun Modu (Game Mode)
-                  </label>
-                  <select
-                    id="always-gamemode"
-                    value={cfg.presence.always_active_game_mode || "Ranked Solo/Duo"}
-                    onChange={(e) => void applyPatch(withAlwaysActiveGameMode(cfg, e.target.value))}
-                    className="border-border bg-surface text-text w-full rounded-sm border px-3 py-1.5 text-sm"
-                  >
-                    {GAME_MODES.map((m) => (
-                      <option key={m} value={m}>
-                        {m}
-                      </option>
-                    ))}
-                  </select>
+                {/* Oyun Süresi / Timer Kontrolleri */}
+                <div className="border-border bg-surface flex flex-wrap items-center justify-between gap-2.5 rounded-sm border p-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-muted text-xs font-medium">Oyun Süresi:</span>
+                    <span className="font-mono text-sm font-semibold tracking-wider text-text">
+                      {formatElapsed(currentElapsed)}
+                    </span>
+                    {isStopped ? (
+                      <span className="bg-surface-raised border border-border text-warn rounded px-1.5 py-0.5 text-[10px] font-medium">
+                        Durduruldu
+                      </span>
+                    ) : (
+                      <span className="bg-surface-raised border border-border text-ok rounded px-1.5 py-0.5 text-[10px] font-medium">
+                        Çalışıyor
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      id="fake-timer-toggle-btn"
+                      onClick={handleToggleTimer}
+                      className={
+                        "press flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs font-medium transition-colors " +
+                        (isStopped
+                          ? "bg-accent text-accent-text font-semibold shadow-xs"
+                          : "border-border bg-surface-raised text-text hover:bg-surface border")
+                      }
+                    >
+                      {isStopped ? (
+                        <>
+                          <Play className="h-3.5 w-3.5 fill-current" />
+                          <span>Başlat</span>
+                        </>
+                      ) : (
+                        <>
+                          <Pause className="h-3.5 w-3.5 fill-current" />
+                          <span>Durdur</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      id="fake-timer-reset-btn"
+                      onClick={handleResetTimer}
+                      title="Süreyi Sıfırla"
+                      className="press border-border bg-surface-raised text-muted hover:text-text hover:bg-surface flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-medium transition-colors"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      <span>Sıfırla</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

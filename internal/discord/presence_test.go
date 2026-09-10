@@ -390,6 +390,34 @@ func TestBuildAlwaysActivePresence_InGame(t *testing.T) {
 	}
 }
 
+func TestBuildAlwaysActivePresence_InGame_TimerStopped(t *testing.T) {
+	cfg := config.DefaultConfig()
+	cfg.Presence.AlwaysActiveMode = "in-game"
+	cfg.Presence.AlwaysActiveChampion = "Yasuo"
+	cfg.Presence.AlwaysActiveTimerStopped = true
+	cfg.Presence.AlwaysActiveStartTime = 12345
+	st := state.NewState()
+
+	got := BuildAlwaysActivePresence(st, cfg)
+	if got.Start != 0 {
+		t.Errorf("Start = %d, want 0 when AlwaysActiveTimerStopped is true", got.Start)
+	}
+}
+
+func TestBuildAlwaysActivePresence_InGame_CustomStartTime(t *testing.T) {
+	cfg := config.DefaultConfig()
+	cfg.Presence.AlwaysActiveMode = "in-game"
+	cfg.Presence.AlwaysActiveChampion = "Yasuo"
+	cfg.Presence.AlwaysActiveTimerStopped = false
+	cfg.Presence.AlwaysActiveStartTime = 12345
+	st := state.NewState()
+
+	got := BuildAlwaysActivePresence(st, cfg)
+	if got.Start != 12345 {
+		t.Errorf("Start = %d, want 12345 from AlwaysActiveStartTime", got.Start)
+	}
+}
+
 func TestMapStateToPresence_AlwaysActiveOverridesInProgress(t *testing.T) {
 	cfg := config.DefaultConfig()
 	cfg.Presence.AlwaysActive = true

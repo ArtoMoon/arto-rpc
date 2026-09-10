@@ -5,6 +5,8 @@ import {
   withAlwaysActiveMode,
   withAlwaysActiveChampion,
   withAlwaysActiveGameMode,
+  withAlwaysActiveTimerStopped,
+  withResetAlwaysActiveTimer,
   withButton,
   withCreditText,
   withShowEmojis,
@@ -58,16 +60,75 @@ describe("withAlwaysActive", () => {
     expect(patch.presence).toEqual({ ...cfg.presence, always_active: true });
   });
 
-  it("sets always_active_mode", () => {
+  it("sets always_active_mode and initializes start time when switching to in-game", () => {
     const cfg = DefaultConfig();
-    const patch = withAlwaysActiveMode(cfg, "in-game");
-    expect(patch.presence).toEqual({ ...cfg.presence, always_active_mode: "in-game" });
+    const patch = withAlwaysActiveMode(cfg, "in-game", 1700000000);
+    expect(patch.presence).toEqual({
+      ...cfg.presence,
+      always_active_mode: "in-game",
+      always_active_start_time: 1700000000,
+      always_active_timer_stopped: false,
+      always_active_paused_duration: 0,
+    });
   });
 
-  it("sets always_active_champion", () => {
+  it("sets always_active_champion and resets timer on champion change", () => {
     const cfg = DefaultConfig();
-    const patch = withAlwaysActiveChampion(cfg, "Aatrox");
-    expect(patch.presence).toEqual({ ...cfg.presence, always_active_champion: "Aatrox" });
+    cfg.presence.always_active_champion = "Yasuo";
+    cfg.presence.always_active_start_time = 1000;
+    cfg.presence.always_active_timer_stopped = true;
+    cfg.presence.always_active_paused_duration = 50;
+
+    const patch = withAlwaysActiveChampion(cfg, "Aatrox", 1700000000);
+    expect(patch.presence).toEqual({
+      ...cfg.presence,
+      always_active_champion: "Aatrox",
+      always_active_start_time: 1700000000,
+      always_active_timer_stopped: false,
+      always_active_paused_duration: 0,
+    });
+  });
+
+  it("keeps start_time if champion is unchanged", () => {
+    const cfg = DefaultConfig();
+    cfg.presence.always_active_champion = "Yasuo";
+    cfg.presence.always_active_start_time = 5000;
+
+    const patch = withAlwaysActiveChampion(cfg, "Yasuo", 1700000000);
+    expect(patch.presence?.always_active_start_time).toBe(5000);
+  });
+
+  it("stops and resumes timer with withAlwaysActiveTimerStopped", () => {
+    const cfg = DefaultConfig();
+    cfg.presence.always_active_start_time = 1000;
+
+    // Stop timer at 60s elapsed
+    const stoppedPatch = withAlwaysActiveTimerStopped(cfg, true, 60);
+    expect(stoppedPatch.presence?.always_active_timer_stopped).toBe(true);
+    expect(stoppedPatch.presence?.always_active_paused_duration).toBe(60);
+
+    // Resume timer with elapsed offset
+    const resumedPatch = withAlwaysActiveTimerStopped(
+      { ...cfg, presence: { ...cfg.presence, ...stoppedPatch.presence } },
+      false,
+      60,
+      2000
+    );
+    expect(resumedPatch.presence?.always_active_timer_stopped).toBe(false);
+    expect(resumedPatch.presence?.always_active_start_time).toBe(1940);
+    expect(resumedPatch.presence?.always_active_paused_duration).toBe(0);
+  });
+
+  it("resets timer with withResetAlwaysActiveTimer", () => {
+    const cfg = DefaultConfig();
+    cfg.presence.always_active_start_time = 1000;
+    cfg.presence.always_active_timer_stopped = true;
+    cfg.presence.always_active_paused_duration = 100;
+
+    const patch = withResetAlwaysActiveTimer(cfg, 1700000000);
+    expect(patch.presence?.always_active_start_time).toBe(1700000000);
+    expect(patch.presence?.always_active_timer_stopped).toBe(false);
+    expect(patch.presence?.always_active_paused_duration).toBe(0);
   });
 
   it("sets always_active_game_mode", () => {

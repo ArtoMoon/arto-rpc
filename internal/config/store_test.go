@@ -94,3 +94,28 @@ func TestStore_SubscribeCoalescesForSlowSubscriber(t *testing.T) {
 	default:
 	}
 }
+
+func TestStore_ApplyResetsTimerOnChampionChange(t *testing.T) {
+	t.Setenv("APPDATA", t.TempDir())
+	orig := DefaultConfig()
+	orig.Presence.AlwaysActiveChampion = "Yasuo"
+	orig.Presence.AlwaysActiveStartTime = 1000
+	orig.Presence.AlwaysActiveTimerStopped = true
+	s := NewStore(orig)
+
+	next := *orig
+	next.Presence.AlwaysActiveChampion = "Zed"
+
+	if err := s.Apply(next); err != nil {
+		t.Fatalf("Apply failed: %v", err)
+	}
+
+	loaded := s.Load()
+	if loaded.Presence.AlwaysActiveStartTime <= 1000 {
+		t.Errorf("AlwaysActiveStartTime = %d, want > 1000 after champion change", loaded.Presence.AlwaysActiveStartTime)
+	}
+	if loaded.Presence.AlwaysActiveTimerStopped {
+		t.Errorf("AlwaysActiveTimerStopped = true, want false after champion change")
+	}
+}
+

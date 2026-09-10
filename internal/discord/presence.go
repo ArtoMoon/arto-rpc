@@ -99,8 +99,12 @@ func BuildAlwaysActivePresence(st *state.State, cfg *config.Config) *RPCData {
 		}
 
 		var start int64
-		if st != nil && st.ApplicationStartTime > 0 {
-			start = st.ApplicationStartTime
+		if !cfg.Presence.AlwaysActiveTimerStopped {
+			if cfg.Presence.AlwaysActiveStartTime > 0 {
+				start = cfg.Presence.AlwaysActiveStartTime
+			} else if st != nil && st.ApplicationStartTime > 0 {
+				start = st.ApplicationStartTime
+			}
 		}
 
 		return &RPCData{
