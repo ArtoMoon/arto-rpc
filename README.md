@@ -8,7 +8,7 @@
 
 <img src="assets/league-rpc.png" width="55%" height="auto" alt="Arto RPC" />
 
-<p>A better League of Legends Rich Presence for Discord.</p>
+<p>A better League of Legends & Valorant Rich Presence for Discord.</p>
 
 <p>
 <a href="https://github.com/ArtoMoon/arto-rpc/releases/latest"><img alt="Downloads" src="https://img.shields.io/github/downloads/ArtoMoon/arto-rpc/total.svg?style=for-the-badge&color=A6E3A1&labelColor=11111B"></a>
@@ -33,13 +33,15 @@
 
 ## About
 
-Welcome to Arto RPC. This application gives you the ability to choose how your League presence is shown on Discord.
+Welcome to Arto RPC. This application gives you full control over how your League of Legends and Valorant presence is shown on Discord.
 
-- **Every game mode.** Summoner's Rift, ARAM, Arena, TFT, Swarm, and more.
-- **All skins supported,** chromas and animated skins included.
-- **Rank, LP, KDA and CS.** You choose what to show and what to hide.
-- **Customization.** You have full control over how the text is displayed on your profile.
-- **A modern GUI with a tray icon.** It keeps running in the background, so the window is only open when you want it there. It can start with Windows too.
+- **League & Valorant Dual Support.** Seamless automatic detection between League of Legends and Valorant.
+- **Every game mode.** Summoner's Rift, ARAM, Arena, TFT, Swarm, Competitive, Unrated, Swiftplay, and Custom games.
+- **All skins & agents supported.** League champion skins (including animated/chromas) and official Valorant agent artwork.
+- **Always Active Mode.** Showcase your favorite League or Valorant profile 24/7 without even launching the game.
+- **Rank, LP, KDA, CS & Score.** You choose what to show and what to hide.
+- **Customization.** Full control over how text and timers are displayed on your profile.
+- **Modern Midnight GUI with a tray icon.** Sleek dark gaming aesthetic that runs quietly in the background and can start with Windows.
 
 Got questions already? Don't hesitate to join the [Discord Community Server](https://discord.gg/uGNkFuK9cj)
 
@@ -148,6 +150,13 @@ Every line Discord shows is a template. Rewrite it, drop in your queue, champion
 
 ![presence-text-editor](images/presence-text.gif)
 
+### Valorant Rich Presence & Always Active
+
+Connect effortlessly with official Valorant Rich Presence:
+- **Live Agents & Maps:** High-definition official CDN icons and artwork for whichever agent and map you're currently playing.
+- **Match Tracking:** Competitive, Unrated, Swiftplay, Custom matches with live round scores, party size, and match timers.
+- **Always Active Mode:** Display your favorite agent (Jett, Reyna, Omen, and more), map, and game mode 24/7 without even launching the game.
+
 ---
 
 ## ⚙️ Settings
@@ -199,6 +208,7 @@ For issues related to the code, or project as a whole, please open an [issue on 
 
 - 2023 - This project was previously called `league-rpc-linux`. When Riot introduced Vanguard and broke league on linux, i renamed it to `league-rpc` and kept maintaining it for Windows users. This is why there is a `League of linux` option to select in the application.
 - 2026 - Rewrote the application from a Terminal based Python app, to a Golang application with a GUI and tray app. Needed to rewrite the entire `lcu-driver` from scratch in golang to get it working. So i built [lcu-gopher](https://github.com/Its-Haze/lcu-gopher) which this project now uses.
+- 2026 (v4.1.0) - Added full Valorant integration with auto-detection, Always Active mode for both League & Valorant, and a modern Midnight UI theme overhaul.
 
 ## Star History
 

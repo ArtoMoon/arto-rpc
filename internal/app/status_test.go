@@ -17,10 +17,13 @@ type fakeConns struct {
 	discord, lcu, league, stalled atomic.Bool
 }
 
-func (f *fakeConns) DiscordConnected() bool      { return f.discord.Load() }
-func (f *fakeConns) LCUConnected() bool          { return f.lcu.Load() }
-func (f *fakeConns) LeagueProcessDetected() bool { return f.league.Load() }
-func (f *fakeConns) LCUStalled() bool            { return f.stalled.Load() }
+func (f *fakeConns) DiscordConnected() bool        { return f.discord.Load() }
+func (f *fakeConns) LCUConnected() bool            { return f.lcu.Load() }
+func (f *fakeConns) LeagueProcessDetected() bool   { return f.league.Load() }
+func (f *fakeConns) LCUStalled() bool              { return f.stalled.Load() }
+func (f *fakeConns) ValorantConnected() bool       { return false }
+func (f *fakeConns) ValorantProcessDetected() bool { return false }
+func (f *fakeConns) ActiveGame() string            { return "league" }
 
 type fakeProbe struct {
 	mu sync.Mutex
@@ -54,6 +57,7 @@ func TestStatusBridge_SnapshotAssemblesFromEverySource(t *testing.T) {
 	want := StatusSnapshot{
 		LeagueProcess:    true,
 		LCUConnected:     false,
+		ActiveGame:       "league",
 		DiscordConnected: true,
 		Paused:           true,
 		GameFlowPhase:    "InProgress",

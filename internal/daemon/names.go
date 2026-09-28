@@ -9,7 +9,16 @@ var discordProcessNames = []string{
 }
 
 // leagueProcessNames are the process names checked to decide whether League
+// is running.
 var leagueProcessNames = []string{
 	constants.LeagueClientProcessName,
 	constants.LeagueClientUxProcessName,
 }
+
+// valorantProcessNames are the process names checked to decide whether Valorant
+// is running.
+var valorantProcessNames = []string{
+	constants.ValorantProcessName,
+	constants.ValorantShippingProcessName,
+}
+

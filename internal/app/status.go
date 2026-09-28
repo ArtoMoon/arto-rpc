@@ -19,6 +19,9 @@ type Connections interface {
 	LCUConnected() bool
 	LeagueProcessDetected() bool
 	LCUStalled() bool
+	ValorantConnected() bool
+	ValorantProcessDetected() bool
+	ActiveGame() string
 }
 
 // PresenceProbe exposes the presence the Updater last transmitted, so the
@@ -30,20 +33,26 @@ type PresenceProbe interface {
 // StatusSnapshot is the status read model the GUI renders. It is assembled in
 // one place and pushed on change so screens never poll the daemon.
 type StatusSnapshot struct {
-	LeagueProcess    bool             `json:"league_process"`
-	LCUConnected     bool             `json:"lcu_connected"`
-	DiscordConnected bool             `json:"discord_connected"`
-	LCUStalled       bool             `json:"lcu_stalled"`
-	Paused           bool             `json:"paused"`
-	GameFlowPhase    string           `json:"gameflow_phase"`
-	Presence         *discord.RPCData `json:"presence"`
-	PresenceCleared  bool             `json:"presence_cleared"`
+	LeagueProcess     bool             `json:"league_process"`
+	LCUConnected      bool             `json:"lcu_connected"`
+	ValorantProcess   bool             `json:"valorant_process"`
+	ValorantConnected bool             `json:"valorant_connected"`
+	ActiveGame        string           `json:"active_game"`
+	DiscordConnected  bool             `json:"discord_connected"`
+	LCUStalled        bool             `json:"lcu_stalled"`
+	Paused            bool             `json:"paused"`
+	GameFlowPhase     string           `json:"gameflow_phase"`
+	Presence          *discord.RPCData `json:"presence"`
+	PresenceCleared   bool             `json:"presence_cleared"`
 }
 
 // equal reports whether two snapshots would render identically.
 func (s StatusSnapshot) equal(o StatusSnapshot) bool {
 	if s.LeagueProcess != o.LeagueProcess ||
 		s.LCUConnected != o.LCUConnected ||
+		s.ValorantProcess != o.ValorantProcess ||
+		s.ValorantConnected != o.ValorantConnected ||
+		s.ActiveGame != o.ActiveGame ||
 		s.LCUStalled != o.LCUStalled ||
 		s.DiscordConnected != o.DiscordConnected ||
 		s.Paused != o.Paused ||
@@ -102,14 +111,17 @@ func (b *statusBridge) snapshot() StatusSnapshot {
 
 	ls := b.probe.LastSent()
 	return StatusSnapshot{
-		LeagueProcess:    b.conns.LeagueProcessDetected(),
-		LCUConnected:     b.conns.LCUConnected(),
-		LCUStalled:       b.conns.LCUStalled(),
-		DiscordConnected: b.conns.DiscordConnected(),
-		Paused:           b.pauser.IsPaused(),
-		GameFlowPhase:    phase,
-		Presence:         ls.Data,
-		PresenceCleared:  ls.Cleared,
+		LeagueProcess:     b.conns.LeagueProcessDetected(),
+		LCUConnected:      b.conns.LCUConnected(),
+		ValorantProcess:   b.conns.ValorantProcessDetected(),
+		ValorantConnected: b.conns.ValorantConnected(),
+		ActiveGame:        b.conns.ActiveGame(),
+		LCUStalled:        b.conns.LCUStalled(),
+		DiscordConnected:  b.conns.DiscordConnected(),
+		Paused:            b.pauser.IsPaused(),
+		GameFlowPhase:     phase,
+		Presence:          ls.Data,
+		PresenceCleared:   ls.Cleared,
 	}
 }
 

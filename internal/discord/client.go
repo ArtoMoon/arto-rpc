@@ -34,6 +34,7 @@ type Client struct {
 	conn           ipcConn
 	connected      bool
 	connectedAppID string // app ID the live connection was opened with
+	appIDProvider  func() string
 }
 
 // NewClient creates a new Discord RPC client
@@ -45,15 +46,33 @@ func NewClient(store *config.Store, logger zerolog.Logger) *Client {
 	}
 }
 
+// SetAppIDProvider sets a dynamic provider for the target Discord App ID (e.g. for Valorant vs League).
+func (c *Client) SetAppIDProvider(provider func() string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.appIDProvider = provider
+}
+
+func (c *Client) desiredAppIDLocked() string {
+	if c.appIDProvider != nil {
+		if id := c.appIDProvider(); id != "" {
+			return id
+		}
+	}
+	return c.store.Load().DiscordAppID
+}
+
 // dialIPC adapts ipc.Dial's concrete return type to the ipcConn interface.
 func dialIPC() (ipcConn, error) {
 	return ipc.Dial()
 }
 
 // Connect dials Discord's IPC pipe and performs the handshake. The app ID is
-// read fresh from the Store so a changed setting takes effect on reconnect.
+// read fresh from the Store or appIDProvider so a changed setting takes effect on reconnect.
 func (c *Client) Connect() error {
-	appID := c.store.Load().DiscordAppID
+	c.mu.Lock()
+	appID := c.desiredAppIDLocked()
+	c.mu.Unlock()
 	c.logger.Info().Str("app_id", appID).Msg("Connecting to Discord RPC...")
 
 	conn, err := c.dial()
@@ -200,11 +219,11 @@ func (c *Client) setActivity(activity *activityPayload) error {
 	return nil
 }
 
-// IsConnected returns whether the client is connected to Discord. A live
+// IsConnected returns whether the client is connected to Discord with the desired app ID.
 func (c *Client) IsConnected() bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.connected && c.connectedAppID == c.store.Load().DiscordAppID
+	return c.connected && c.connectedAppID == c.desiredAppIDLocked()
 }
 
 // timestampFor builds the "Elapsed" timer timestamp, or nil if unset.

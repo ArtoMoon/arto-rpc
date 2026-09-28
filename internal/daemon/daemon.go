@@ -8,6 +8,7 @@ import (
 
 	"github.com/ArtoMoon/arto-rpc/internal/discord"
 	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/internal/valorant"
 	"github.com/ArtoMoon/arto-rpc/pkg/types"
 	"github.com/rs/zerolog"
 )
@@ -33,6 +34,23 @@ type lcuRunner interface {
 	LeagueProcessDetected() bool
 }
 
+// valorantRunner reports Valorant presence and process state.
+type valorantRunner interface {
+	runner
+	Connected() bool
+	ProcessRunning() bool
+	Get() *valorant.State
+	Subscribe() <-chan *valorant.State
+}
+
+// DaemonOption configures a Daemon.
+type DaemonOption func(*Daemon)
+
+// WithValorantRunner sets the Valorant supervisor for the daemon.
+func WithValorantRunner(v valorantRunner) DaemonOption {
+	return func(d *Daemon) { d.valorant = v }
+}
+
 // liveGamePoller polls Live Client Data for champion/skin/KDA/timer detail
 type liveGamePoller interface {
 	Run(ctx context.Context, gameMode types.GameMode)
@@ -54,6 +72,7 @@ const (
 type Daemon struct {
 	discord  discordRunner
 	lcu      lcuRunner
+	valorant valorantRunner
 	updater  *discord.Updater
 	state    *state.Manager
 	liveGame liveGamePoller
@@ -100,8 +119,9 @@ func New(
 	liveGame liveGamePoller,
 	logger zerolog.Logger,
 	presencePollInterval, placeholderInterval time.Duration,
+	opts ...DaemonOption,
 ) *Daemon {
-	return &Daemon{
+	d := &Daemon{
 		discord:              discordSup,
 		lcu:                  lcuSup,
 		updater:              updater,
@@ -112,6 +132,10 @@ func New(
 		placeholderInterval:  placeholderInterval,
 		pauseSignal:          make(chan struct{}, 1),
 	}
+	for _, opt := range opts {
+		opt(d)
+	}
+	return d
 }
 
 // SetPaused sets the runtime pause flag and wakes the presence loop so it
@@ -136,6 +160,55 @@ func (d *Daemon) LCUConnected() bool { return d.lcu.Connected() }
 // LeagueProcessDetected reports whether League's own process is running.
 func (d *Daemon) LeagueProcessDetected() bool { return d.lcu.LeagueProcessDetected() }
 
+// ValorantConnected reports whether Valorant's local API is currently answering.
+func (d *Daemon) ValorantConnected() bool {
+	return d.valorant != nil && d.valorant.Connected()
+}
+
+// ValorantProcessDetected reports whether Valorant's process is currently running.
+func (d *Daemon) ValorantProcessDetected() bool {
+	return d.valorant != nil && d.valorant.ProcessRunning()
+}
+
+// ActiveGame reports which game is currently active: "league", "valorant", or "".
+func (d *Daemon) ActiveGame() string {
+	cfg := d.updater.Config()
+	if cfg != nil && cfg.Presence.AlwaysActive {
+		if cfg.Presence.AlwaysActiveGame == "valorant" {
+			return "valorant"
+		}
+		return "league"
+	}
+
+	valRunning := d.ValorantProcessDetected()
+	leagueRunning := d.LeagueProcessDetected()
+
+	if valRunning && !leagueRunning {
+		return "valorant"
+	}
+	if leagueRunning && !valRunning {
+		return "league"
+	}
+	if valRunning && leagueRunning {
+		// Both running: prioritize in-match game
+		if d.state.Get().GameFlowPhase == types.GameFlowInProgress {
+			return "league"
+		}
+		if d.valorant != nil && d.valorant.Get().SessionLoopState == "INGAME" {
+			return "valorant"
+		}
+		// If neither is in-game, prioritize whichever is connected
+		if d.lcu.Connected() && !d.valorant.Connected() {
+			return "league"
+		}
+		if d.valorant != nil && d.valorant.Connected() && !d.lcu.Connected() {
+			return "valorant"
+		}
+		return "league"
+	}
+	return ""
+}
+
 // LastSent returns the presence the Updater last pushed to Discord.
 func (d *Daemon) LastSent() discord.LastSent { return d.updater.LastSent() }
 
@@ -147,7 +220,11 @@ func (d *Daemon) SubscribeState() <-chan *state.State { return d.state.Subscribe
 // is canceled; a connection failure on either side never returns early.
 func (d *Daemon) Run(ctx context.Context) {
 	var wg sync.WaitGroup
-	wg.Add(4)
+	count := 4
+	if d.valorant != nil {
+		count++
+	}
+	wg.Add(count)
 
 	go func() {
 		defer wg.Done()
@@ -157,6 +234,12 @@ func (d *Daemon) Run(ctx context.Context) {
 		defer wg.Done()
 		d.lcu.Run(ctx)
 	}()
+	if d.valorant != nil {
+		go func() {
+			defer wg.Done()
+			d.valorant.Run(ctx)
+		}()
+	}
 	go func() {
 		defer wg.Done()
 		d.updater.Run(ctx)
@@ -176,6 +259,11 @@ func (d *Daemon) presenceLoop(ctx context.Context) {
 	defer ticker.Stop()
 
 	cfgUpdates := d.updater.ConfigChanges()
+
+	var valUpdates <-chan *valorant.State
+	if d.valorant != nil {
+		valUpdates = d.valorant.Subscribe()
+	}
 
 	mode := modeUnknown
 	discordConnected := false
@@ -269,7 +357,11 @@ func (d *Daemon) presenceLoop(ctx context.Context) {
 		if nowConnected && !discordConnected {
 			switch mode {
 			case modeConnected:
-				d.updater.ImmediateUpdate(d.state.Get())
+				if d.ActiveGame() == "valorant" {
+					d.updater.UpdateDirect(valorant.BuildPresence(d.valorant.Get(), d.updater.Config()))
+				} else {
+					d.updater.ImmediateUpdate(d.state.Get())
+				}
 			case modePlaceholder:
 				sendPlaceholder()
 			}
@@ -278,13 +370,32 @@ func (d *Daemon) presenceLoop(ctx context.Context) {
 
 		// League is up but Discord isn't reachable yet: log it once per
 		// edge, not on every poll tick, so it isn't spammy.
-		if d.lcu.LeagueProcessDetected() && !nowConnected {
+		if (d.lcu.LeagueProcessDetected() || d.ValorantProcessDetected()) && !nowConnected {
 			if !waitingForDiscordLogged {
-				d.logger.Info().Msg("League is running, waiting for Discord to be reachable")
+				d.logger.Info().Msg("Game is running, waiting for Discord to be reachable")
 				waitingForDiscordLogged = true
 			}
 		} else {
 			waitingForDiscordLogged = false
+		}
+
+		activeGame := d.ActiveGame()
+		if activeGame == "valorant" {
+			stopPlaceholder()
+			stopLiveGame()
+			d.lcuStalled.Store(false)
+			stallLogged = false
+
+			if d.discord.Connected() {
+				if d.updater.Config().Presence.AlwaysActive {
+					d.updater.UpdateDirect(valorant.BuildAlwaysActivePresence(d.updater.Config()))
+				} else {
+					valSt := d.valorant.Get()
+					d.updater.UpdateDirect(valorant.BuildPresence(valSt, d.updater.Config()))
+				}
+			}
+			mode = modeConnected
+			return
 		}
 
 		if d.updater.Config().Presence.AlwaysActive {
@@ -367,20 +478,38 @@ func (d *Daemon) presenceLoop(ctx context.Context) {
 		case <-ctx.Done():
 			return
 
+		case valSt, ok := <-valUpdates:
+			if !ok {
+				return
+			}
+			if d.ActiveGame() == "valorant" && d.discord.Connected() && !d.paused.Load() {
+				d.updater.UpdateDirect(valorant.BuildPresence(valSt, d.updater.Config()))
+				mode = modeConnected
+			}
+
 		case st, ok := <-d.state.Updates():
 			if !ok {
 				return
 			}
-			if mode == modeConnected && !d.updater.Config().Presence.AlwaysActive {
+			if d.ActiveGame() != "valorant" && mode == modeConnected && !d.updater.Config().Presence.AlwaysActive {
 				d.updater.DelayUpdate(st)
 			}
 
 		case <-cfgUpdates:
 			// Display settings may have changed; reflect them now instead of
 			// waiting for the next real state change or poll tick.
-			if d.discord.Connected() && (d.updater.Config().Presence.AlwaysActive || mode == modeConnected) {
-				d.updater.ImmediateUpdate(d.state.Get())
-				mode = modeConnected
+			if d.discord.Connected() {
+				if d.ActiveGame() == "valorant" {
+					if d.updater.Config().Presence.AlwaysActive {
+						d.updater.UpdateDirect(valorant.BuildAlwaysActivePresence(d.updater.Config()))
+					} else {
+						d.updater.UpdateDirect(valorant.BuildPresence(d.valorant.Get(), d.updater.Config()))
+					}
+					mode = modeConnected
+				} else if d.updater.Config().Presence.AlwaysActive || mode == modeConnected {
+					d.updater.ImmediateUpdate(d.state.Get())
+					mode = modeConnected
+				}
 			}
 			reconcile()
 

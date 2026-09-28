@@ -119,3 +119,54 @@ export function withButton(cfg: Config, label: string, url: string): Partial<Con
   return { presence: { ...cfg.presence, button_label: label, button_url: url } };
 }
 
+export function withAlwaysActiveGame(
+  cfg: Config,
+  game: "league" | "valorant",
+  nowSec: number = Math.floor(Date.now() / 1000)
+): Partial<Config> {
+  const changed = cfg.presence.always_active_game !== game;
+  return {
+    presence: {
+      ...cfg.presence,
+      always_active_game: game,
+      ...(changed
+        ? {
+            always_active_start_time: nowSec,
+            always_active_timer_stopped: false,
+            always_active_paused_duration: 0,
+          }
+        : {}),
+    },
+  };
+}
+
+export function withAlwaysActiveValorantAgent(
+  cfg: Config,
+  agent: string,
+  nowSec: number = Math.floor(Date.now() / 1000)
+): Partial<Config> {
+  const changed = cfg.presence.always_active_valorant_agent !== agent;
+  return {
+    presence: {
+      ...cfg.presence,
+      always_active_valorant_agent: agent,
+      ...(changed
+        ? {
+            always_active_start_time: nowSec,
+            always_active_timer_stopped: false,
+            always_active_paused_duration: 0,
+          }
+        : {}),
+    },
+  };
+}
+
+export function withAlwaysActiveValorantMap(cfg: Config, mapName: string): Partial<Config> {
+  return { presence: { ...cfg.presence, always_active_valorant_map: mapName } };
+}
+
+export function withAlwaysActiveValorantQueue(cfg: Config, queue: string): Partial<Config> {
+  return { presence: { ...cfg.presence, always_active_valorant_queue: queue } };
+}
+
+

@@ -363,6 +363,37 @@ func (u *Updater) UpdatePlaceholder(rpcData *RPCData) {
 	u.stopHeartbeat()
 }
 
+// UpdateDirect sends rpcData directly (e.g. for Valorant presence), recording it
+// and maintaining heartbeat/reclaim protection.
+func (u *Updater) UpdateDirect(rpcData *RPCData) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
+	if u.timer != nil {
+		u.timer.Stop()
+		u.timer = nil
+	}
+
+	if rpcData == nil {
+		return
+	}
+
+	if u.previousRPCData != nil && u.previousRPCData.Equals(rpcData) {
+		return
+	}
+
+	if err := u.client.UpdatePresence(rpcData); err != nil {
+		u.logger.Warn().Err(err).Msg("Failed to update Discord presence (direct)")
+		return
+	}
+
+	u.previousState = nil
+	u.previousRPCData = rpcData.Copy()
+	u.lastSentDetails = rpcData.Details
+	u.recordSent(rpcData)
+	u.startReclaimBurst()
+}
+
 // ClearPresence clears the Discord presence
 func (u *Updater) ClearPresence() {
 	u.mu.Lock()

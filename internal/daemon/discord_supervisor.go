@@ -21,9 +21,15 @@ type DiscordSupervisor struct {
 	processNames []string
 	pollInterval time.Duration
 	league       LeagueDetector
+	gameRunning  func() bool
 	alwaysActive func() bool
 	processUp    atomic.Bool
 	connected    atomic.Bool
+}
+
+// SetGameRunning overrides the process-active predicate that gates Discord connection.
+func (ds *DiscordSupervisor) SetGameRunning(fn func() bool) {
+	ds.gameRunning = fn
 }
 
 // newDiscordSupervisor builds a DiscordSupervisor; league gates connect/stay-connected.
@@ -80,7 +86,13 @@ func (c *discordGatedConnector) IsConnected() bool {
 	if c.ds.alwaysActive != nil && c.ds.alwaysActive() {
 		return c.Connector.IsConnected() && c.ds.processRunning()
 	}
-	return c.Connector.IsConnected() && c.ds.processRunning() && c.ds.league.LeagueProcessDetected()
+	gameActive := false
+	if c.ds.gameRunning != nil {
+		gameActive = c.ds.gameRunning()
+	} else if c.ds.league != nil {
+		gameActive = c.ds.league.LeagueProcessDetected()
+	}
+	return c.Connector.IsConnected() && c.ds.processRunning() && gameActive
 }
 
 func (ds *DiscordSupervisor) processRunning() bool {

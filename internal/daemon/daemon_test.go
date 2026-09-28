@@ -11,6 +11,7 @@ import (
 	"github.com/ArtoMoon/arto-rpc/internal/config"
 	"github.com/ArtoMoon/arto-rpc/internal/discord"
 	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/internal/valorant"
 	"github.com/ArtoMoon/arto-rpc/pkg/types"
 	"github.com/rs/zerolog"
 )
@@ -576,3 +577,82 @@ func TestDaemon_AlwaysActiveKeepsPresenceWithoutLeague(t *testing.T) {
 		t.Errorf("ClearPresence() called %d times, want 0 when AlwaysActive", sender.clearCount())
 	}
 }
+
+type fakeValorantRunner struct {
+	fakeRunner
+	valDetected atomic.Bool
+	connected   atomic.Bool
+	mu          sync.Mutex
+	st          *valorant.State
+	ch          chan *valorant.State
+}
+
+func newFakeValorantRunner() *fakeValorantRunner {
+	return &fakeValorantRunner{
+		st: &valorant.State{},
+		ch: make(chan *valorant.State, 5),
+	}
+}
+
+func (r *fakeValorantRunner) ProcessRunning() bool { return r.valDetected.Load() }
+func (r *fakeValorantRunner) Connected() bool      { return r.connected.Load() }
+func (r *fakeValorantRunner) Get() *valorant.State {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.st.Copy()
+}
+func (r *fakeValorantRunner) set(st *valorant.State) {
+	r.mu.Lock()
+	r.st = st.Copy()
+	r.mu.Unlock()
+	select {
+	case r.ch <- st.Copy():
+	default:
+	}
+}
+func (r *fakeValorantRunner) Subscribe() <-chan *valorant.State {
+	return r.ch
+}
+
+func TestDaemon_Valorant_PresenceWhenValorantRunning(t *testing.T) {
+	discordRunner := &fakeRunner{}
+	discordRunner.connected.Store(true)
+	lcuRunner := &fakeLCURunner{} // League closed
+	valRunner := newFakeValorantRunner()
+	valRunner.valDetected.Store(true)
+	valRunner.connected.Store(true)
+	valRunner.set(&valorant.State{
+		ProcessRunning:   true,
+		Connected:        true,
+		SessionLoopState: "INGAME",
+		QueueName:        "Competitive",
+		MapName:          "Ascent",
+		MapAsset:         "ascent",
+		AllyScore:        7,
+		EnemyScore:       5,
+	})
+
+	sender := &fakePresenceSender{}
+	sender.connected.Store(true)
+	store := config.NewStore(config.DefaultConfig())
+	updater := discord.NewUpdater(sender, store, zerolog.Nop())
+	stateMgr := state.NewManager(zerolog.Nop())
+	d := New(discordRunner, lcuRunner, updater, stateMgr, &fakeLiveGamePoller{}, zerolog.Nop(), testPollInterval, testPollInterval,
+		WithValorantRunner(valRunner))
+
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	go d.Run(ctx)
+
+	waitFor(t, testTimeout, func() bool { return d.ActiveGame() == "valorant" })
+	waitFor(t, testTimeout, func() bool { return sender.sendCount() > 0 })
+
+	ls := d.LastSent()
+	if ls.Data == nil || ls.Data.Details != "Competitive - Ascent" {
+		t.Fatalf("unexpected last sent presence: %+v", ls.Data)
+	}
+	if ls.Data.State != "Score: 7 - 5" {
+		t.Fatalf("unexpected last sent state: %q", ls.Data.State)
+	}
+}
+

@@ -28,12 +28,13 @@ const (
 	DefaultPlaceholderInterval  = 5 * time.Second
 )
 
-// discordGate is a Gate that waits for League's process and Discord's
+// discordGate is a Gate that waits for a game process and Discord's
 // process to both be running before allowing a connect attempt. See ADR-0003.
 // When alwaysActive reports true, it only waits for Discord's process.
 type discordGate struct {
 	checker      ProcessChecker
 	league       LeagueDetector
+	gameRunning  func() bool
 	alwaysActive func() bool
 }
 
@@ -41,7 +42,13 @@ func (g *discordGate) Ready() (bool, error) {
 	if g.alwaysActive != nil && g.alwaysActive() {
 		return g.checker.IsRunning(discordProcessNames...)
 	}
-	if !g.league.LeagueProcessDetected() {
+	gameActive := false
+	if g.gameRunning != nil {
+		gameActive = g.gameRunning()
+	} else if g.league != nil {
+		gameActive = g.league.LeagueProcessDetected()
+	}
+	if !gameActive {
 		return false, nil
 	}
 	return g.checker.IsRunning(discordProcessNames...)
@@ -50,8 +57,17 @@ func (g *discordGate) Ready() (bool, error) {
 // NewDiscordSupervisor builds the production Discord Connection Supervisor.
 // league is typically the already-built LCUSupervisor.
 func NewDiscordSupervisor(client *discord.Client, checker ProcessChecker, league LeagueDetector, alwaysActive func() bool) *DiscordSupervisor {
-	return newDiscordSupervisor(client, checker, league, alwaysActive, DefaultRetryInterval, DefaultConnectPollInterval, DefaultProcessPollInterval,
-		WithGate(&discordGate{checker: checker, league: league, alwaysActive: alwaysActive}))
+	return NewDiscordSupervisorWithGameGate(client, checker, league, nil, alwaysActive)
+}
+
+// NewDiscordSupervisorWithGameGate builds the production Discord Connection Supervisor with a custom gameRunning gate.
+func NewDiscordSupervisorWithGameGate(client *discord.Client, checker ProcessChecker, league LeagueDetector, gameRunning func() bool, alwaysActive func() bool) *DiscordSupervisor {
+	sup := newDiscordSupervisor(client, checker, league, alwaysActive, DefaultRetryInterval, DefaultConnectPollInterval, DefaultProcessPollInterval,
+		WithGate(&discordGate{checker: checker, league: league, gameRunning: gameRunning, alwaysActive: alwaysActive}))
+	if gameRunning != nil {
+		sup.SetGameRunning(gameRunning)
+	}
+	return sup
 }
 
 // NewLeagueSupervisor builds the production LCU Connection Supervisor.

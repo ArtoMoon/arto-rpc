@@ -11,9 +11,10 @@ const (
 	AppName = "Arto RPC"
 
 	// Discord App IDs
-	DiscordAppIDDefault = "1194034071588851783" // League of Legends
-	DiscordAppIDKittens = "1230607224296968303" // League of Kittens
-	DiscordAppIDLinux   = "1185274747836174377" // League of Linux
+	DiscordAppIDDefault  = "1194034071588851783" // League of Legends
+	DiscordAppIDKittens  = "1230607224296968303" // League of Kittens
+	DiscordAppIDLinux    = "1185274747836174377" // League of Linux
+	DiscordAppIDValorant = "700136079562375258"  // VALORANT
 
 	// LCU API Endpoints (for reference)
 	EndpointSummoner             = "/lol-summoner/v1/current-summoner"
@@ -39,10 +40,12 @@ const (
 	DefaultUpdateInterval = 1500 // milliseconds
 
 	// Process Names
-	DiscordProcessName        = "Discord.exe"
-	LeagueClientProcessName   = "LeagueClient.exe"
-	LeagueClientUxProcessName = "LeagueClientUx.exe"
-	RiotClientProcessName     = "RiotClientServices.exe"
+	DiscordProcessName          = "Discord.exe"
+	LeagueClientProcessName     = "LeagueClient.exe"
+	LeagueClientUxProcessName   = "LeagueClientUx.exe"
+	RiotClientProcessName       = "RiotClientServices.exe"
+	ValorantProcessName         = "VALORANT.exe"
+	ValorantShippingProcessName = "VALORANT-Win64-Shipping.exe"
 )
 
 // SmallText is the small-icon hover tooltip shown on every presence state.

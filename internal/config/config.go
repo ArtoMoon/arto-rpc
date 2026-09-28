@@ -40,10 +40,14 @@ type DisplayDefaults struct {
 type PresenceConfig struct {
 	ShowEmojis   bool                    `json:"show_emojis"`    // online/away emoji
 	ShowInClient bool                    `json:"show_in_client"` // presence while idle in client
-	AlwaysActive         bool                    `json:"always_active"`          // keep presence active 24/7 with the static presence
-	AlwaysActiveMode     string                  `json:"always_active_mode"`     // in-client | in-game
-	AlwaysActiveChampion     string                  `json:"always_active_champion"`      // fake in-game champion (e.g. Yasuo)
-	AlwaysActiveGameMode     string                  `json:"always_active_game_mode"`      // fake in-game mode (e.g. Ranked Solo/Duo)
+	AlwaysActive               bool                    `json:"always_active"`                  // keep presence active 24/7 with the static presence
+	AlwaysActiveMode           string                  `json:"always_active_mode"`             // in-client | in-game
+	AlwaysActiveGame           string                  `json:"always_active_game"`             // league | valorant
+	AlwaysActiveChampion       string                  `json:"always_active_champion"`         // fake in-game champion (e.g. Yasuo)
+	AlwaysActiveGameMode       string                  `json:"always_active_game_mode"`         // fake in-game mode (e.g. Ranked Solo/Duo)
+	AlwaysActiveValorantAgent  string                  `json:"always_active_valorant_agent"`   // fake in-game valorant agent (e.g. Sage)
+	AlwaysActiveValorantMap    string                  `json:"always_active_valorant_map"`     // fake in-game valorant map (e.g. Ascent)
+	AlwaysActiveValorantQueue  string                  `json:"always_active_valorant_queue"`   // fake in-game valorant queue (e.g. Competitive)
 	AlwaysActiveStartTime      int64                   `json:"always_active_start_time"`       // fake in-game start timestamp (unix seconds)
 	AlwaysActiveTimerStopped   bool                    `json:"always_active_timer_stopped"`    // whether fake in-game timer is stopped
 	AlwaysActivePausedDuration int64                   `json:"always_active_paused_duration"` // fake in-game paused duration in seconds
@@ -97,8 +101,12 @@ func DefaultConfig() *Config {
 			ShowInClient:               true,
 			AlwaysActive:               false,
 			AlwaysActiveMode:           "in-client",
+			AlwaysActiveGame:           "league",
 			AlwaysActiveChampion:       "Yasuo",
 			AlwaysActiveGameMode:       "Ranked Solo/Duo",
+			AlwaysActiveValorantAgent:  "Sage",
+			AlwaysActiveValorantMap:    "Ascent",
+			AlwaysActiveValorantQueue:  "Competitive",
 			AlwaysActiveStartTime:      0,
 			AlwaysActiveTimerStopped:   false,
 			AlwaysActivePausedDuration: 0,
@@ -215,11 +223,23 @@ func (c *Config) clamp() {
 	if c.Presence.AlwaysActiveMode != "in-game" {
 		c.Presence.AlwaysActiveMode = "in-client"
 	}
+	if c.Presence.AlwaysActiveGame != "valorant" {
+		c.Presence.AlwaysActiveGame = "league"
+	}
 	if c.Presence.AlwaysActiveChampion == "" {
 		c.Presence.AlwaysActiveChampion = "Yasuo"
 	}
 	if c.Presence.AlwaysActiveGameMode == "" {
 		c.Presence.AlwaysActiveGameMode = "Ranked Solo/Duo"
+	}
+	if c.Presence.AlwaysActiveValorantAgent == "" {
+		c.Presence.AlwaysActiveValorantAgent = "Sage"
+	}
+	if c.Presence.AlwaysActiveValorantMap == "" {
+		c.Presence.AlwaysActiveValorantMap = "Ascent"
+	}
+	if c.Presence.AlwaysActiveValorantQueue == "" {
+		c.Presence.AlwaysActiveValorantQueue = "Competitive"
 	}
 	if c.Presence.Templates == nil {
 		c.Presence.Templates = map[string]TemplatePair{}
@@ -239,5 +259,6 @@ func DiscordAppIDPresets() map[string]string {
 		"League of Legends": constants.DiscordAppIDDefault,
 		"League of Kittens": constants.DiscordAppIDKittens,
 		"League of Linux":   constants.DiscordAppIDLinux,
+		"VALORANT":          constants.DiscordAppIDValorant,
 	}
 }

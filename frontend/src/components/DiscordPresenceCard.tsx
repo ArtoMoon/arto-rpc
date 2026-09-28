@@ -30,18 +30,18 @@ export function DiscordPresenceCard({
   const elapsed = useElapsedTime(startUnixSeconds ?? 0);
 
   return (
-    <div className="bg-surface-raised flex gap-3 rounded-md p-3">
+    <div className="bg-surface-raised/80 border border-border/70 flex gap-3.5 rounded-xl p-3.5 shadow-md">
       {(largeImage || smallImage) && (
         <div className="relative size-16 shrink-0">
           {largeImage && (
-            <img src={largeImage} alt="" title={largeText || undefined} className="size-16 rounded-md object-cover" />
+            <img src={largeImage} alt="" title={largeText || undefined} className="size-16 rounded-lg object-cover shadow-sm" />
           )}
           {smallImage && (
             <img
               src={smallImage}
               alt=""
               title={smallText || undefined}
-              className="bg-surface-raised absolute -right-1.5 -bottom-1.5 size-6 rounded-full object-cover ring-4 ring-[var(--color-surface-raised)]"
+              className="bg-surface-raised absolute -right-1.5 -bottom-1.5 size-6 rounded-full object-cover ring-2 ring-[var(--color-surface-raised)]"
             />
           )}
         </div>

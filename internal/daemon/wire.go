@@ -8,6 +8,8 @@ import (
 	"github.com/ArtoMoon/arto-rpc/internal/livegame"
 	"github.com/ArtoMoon/arto-rpc/internal/process"
 	"github.com/ArtoMoon/arto-rpc/internal/state"
+	"github.com/ArtoMoon/arto-rpc/internal/valorant"
+	"github.com/ArtoMoon/arto-rpc/pkg/constants"
 	"github.com/rs/zerolog"
 )
 
@@ -21,15 +23,35 @@ func Wire(store *config.Store, logger zerolog.Logger) *Daemon {
 	updater := discord.NewUpdater(discordClient, store, logger)
 	checker := process.NewChecker()
 
+	valClient := valorant.NewClient(logger)
+	valSup := valorant.NewSupervisor(checker, valClient, logger)
+
 	lcuSup := NewLeagueSupervisor(lcuClient, checker)
 	alwaysActive := func() bool {
 		return store.Load().Presence.AlwaysActive
 	}
-	discordSup := NewDiscordSupervisor(discordClient, checker, lcuSup, alwaysActive)
+	gameRunning := func() bool {
+		return lcuSup.LeagueProcessDetected() || valSup.ProcessRunning()
+	}
+	discordSup := NewDiscordSupervisorWithGameGate(discordClient, checker, lcuSup, gameRunning, alwaysActive)
+
+	var d *Daemon
+	discordClient.SetAppIDProvider(func() string {
+		cfg := store.Load()
+		if cfg != nil && cfg.Presence.AlwaysActive && cfg.Presence.AlwaysActiveGame == "valorant" {
+			return constants.DiscordAppIDValorant
+		}
+		if d != nil && d.ActiveGame() == "valorant" {
+			return constants.DiscordAppIDValorant
+		}
+		return store.Load().DiscordAppID
+	})
 
 	championResolver := championdata.NewResolver(championdata.NewProductionHTTPDoer())
 	liveGamePoller := livegame.NewPoller(liveGameClient, championResolver, stateMgr, store, logger)
 
-	return New(discordSup, lcuSup, updater, stateMgr, liveGamePoller, logger,
-		DefaultPresencePollInterval, DefaultPlaceholderInterval)
+	d = New(discordSup, lcuSup, updater, stateMgr, liveGamePoller, logger,
+		DefaultPresencePollInterval, DefaultPlaceholderInterval,
+		WithValorantRunner(valSup))
+	return d
 }

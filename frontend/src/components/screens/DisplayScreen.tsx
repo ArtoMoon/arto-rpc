@@ -6,8 +6,12 @@ import { useSettings } from "../../hooks/useSettings";
 import {
   withAlwaysActive,
   withAlwaysActiveMode,
+  withAlwaysActiveGame,
   withAlwaysActiveChampion,
   withAlwaysActiveGameMode,
+  withAlwaysActiveValorantAgent,
+  withAlwaysActiveValorantMap,
+  withAlwaysActiveValorantQueue,
   withAlwaysActiveTimerStopped,
   withResetAlwaysActiveTimer,
   withButton,
@@ -18,6 +22,7 @@ import {
   withShowStats,
 } from "../../lib/displayPatch";
 import { POPULAR_CHAMPIONS, GAME_MODES } from "../../lib/champions";
+import { VALORANT_AGENTS, VALORANT_MAPS, VALORANT_QUEUES } from "../../lib/valorant";
 import { PRESENCE_CONTEXT_LABELS, PRESENCE_CONTEXTS } from "../../lib/presenceContexts";
 import { Field, SettingsCard, Tabs, Toggle } from "../ui";
 import { TemplateEditor } from "./display/TemplateEditor";
@@ -44,6 +49,7 @@ export function DisplayScreen() {
   // Local champion input state — avoids the controlled-input flicker where every
   // keystroke round-trips through the backend and resets the cursor position.
   const [localChampion, setLocalChampion] = useState<string | null>(null);
+  const [localAgent, setLocalAgent] = useState<string | null>(null);
   const championInputRef = useRef<HTMLInputElement>(null);
 
   const isFakeInGame = Boolean(
@@ -168,89 +174,108 @@ export function DisplayScreen() {
           />
         </Field>
         {cfg.presence.always_active && (
-          <div className="bg-surface-raised border-border flex flex-col gap-3 rounded-md border p-3">
+          <div className="bg-surface-raised border-border flex flex-col gap-3 rounded-xl border p-4 shadow-sm">
+            {/* Oyun Seçimi: League vs Valorant */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-text text-xs font-medium">Always Active Görünümü (Presence Type)</label>
+              <label className="text-text text-xs font-semibold uppercase tracking-wider text-muted">
+                Oyun Seçimi (Game Platform)
+              </label>
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => void applyPatch(withAlwaysActiveMode(cfg, "in-client"))}
+                  onClick={() => void applyPatch(withAlwaysActiveGame(cfg, "league"))}
                   className={
-                    "press rounded-sm px-3 py-1.5 text-xs font-medium transition-colors " +
-                    (cfg.presence.always_active_mode !== "in-game"
-                      ? "bg-accent text-accent-text font-semibold shadow-xs"
-                      : "bg-surface text-muted hover:text-text")
+                    "press rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all " +
+                    (cfg.presence.always_active_game !== "valorant"
+                      ? "bg-accent text-accent-text font-bold shadow-md shadow-amber-500/20"
+                      : "bg-surface text-muted hover:text-text border border-border/60")
                   }
                 >
-                  🟢 İstemcide (In Client)
+                  🏆 League of Legends
                 </button>
                 <button
                   type="button"
-                  onClick={() => void applyPatch(withAlwaysActiveMode(cfg, "in-game"))}
+                  onClick={() => void applyPatch(withAlwaysActiveGame(cfg, "valorant"))}
                   className={
-                    "press rounded-sm px-3 py-1.5 text-xs font-medium transition-colors " +
-                    (cfg.presence.always_active_mode === "in-game"
-                      ? "bg-accent text-accent-text font-semibold shadow-xs"
-                      : "bg-surface text-muted hover:text-text")
+                    "press rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all " +
+                    (cfg.presence.always_active_game === "valorant"
+                      ? "bg-accent text-accent-text font-bold shadow-md shadow-amber-500/20"
+                      : "bg-surface text-muted hover:text-text border border-border/60")
                   }
                 >
-                  🎮 Oyunda (Fake In-Game)
+                  🎯 VALORANT
                 </button>
               </div>
             </div>
 
-            {cfg.presence.always_active_mode === "in-game" && (
-              <div className="flex flex-col gap-3 pt-1">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {/* VALORANT Fake Presence */}
+            {cfg.presence.always_active_game === "valorant" ? (
+              <div className="flex flex-col gap-3 pt-1 border-t border-border/60">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor="always-champion" className="text-text text-xs font-medium">
-                      Şampiyon (Champion)
+                    <label htmlFor="always-agent" className="text-text text-xs font-medium">
+                      Ajan (Agent)
                     </label>
                     <input
-                      ref={championInputRef}
-                      id="always-champion"
-                      list="champions-list"
+                      id="always-agent"
+                      list="agents-list"
                       type="text"
-                      value={localChampion ?? cfg.presence.always_active_champion ?? ""}
-                      placeholder="Yasuo"
+                      value={localAgent ?? cfg.presence.always_active_valorant_agent ?? "Sage"}
+                      placeholder="Sage"
                       onChange={(e) => {
                         const val = e.target.value;
-                        setLocalChampion(val);
-                        // When the user picks from the datalist the browser fires a
-                        // change event whose value exactly matches one of the options.
-                        if (POPULAR_CHAMPIONS.includes(val)) {
-                          void applyPatch(withAlwaysActiveChampion(cfg, val));
-                          setLocalChampion(null);
+                        setLocalAgent(val);
+                        if (VALORANT_AGENTS.includes(val)) {
+                          void applyPatch(withAlwaysActiveValorantAgent(cfg, val));
+                          setLocalAgent(null);
                         }
                       }}
                       onBlur={() => {
-                        if (localChampion !== null) {
-                          void applyPatch(withAlwaysActiveChampion(cfg, localChampion));
-                          setLocalChampion(null);
+                        if (localAgent !== null) {
+                          void applyPatch(withAlwaysActiveValorantAgent(cfg, localAgent));
+                          setLocalAgent(null);
                         }
                       }}
-                      className="border-border bg-surface text-text w-full rounded-sm border px-3 py-1.5 text-sm"
+                      className="border-border bg-surface text-text w-full rounded-lg border px-3 py-1.5 text-sm"
                     />
-                    <datalist id="champions-list">
-                      {POPULAR_CHAMPIONS.map((c) => (
-                        <option key={c} value={c} />
+                    <datalist id="agents-list">
+                      {VALORANT_AGENTS.map((a) => (
+                        <option key={a} value={a} />
                       ))}
                     </datalist>
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor="always-gamemode" className="text-text text-xs font-medium">
-                      Oyun Modu (Game Mode)
+                    <label htmlFor="always-map" className="text-text text-xs font-medium">
+                      Harita (Map)
                     </label>
                     <select
-                      id="always-gamemode"
-                      value={cfg.presence.always_active_game_mode || "Ranked Solo/Duo"}
-                      onChange={(e) => void applyPatch(withAlwaysActiveGameMode(cfg, e.target.value))}
-                      className="border-border bg-surface text-text w-full rounded-sm border px-3 py-1.5 text-sm"
+                      id="always-map"
+                      value={cfg.presence.always_active_valorant_map || "Ascent"}
+                      onChange={(e) => void applyPatch(withAlwaysActiveValorantMap(cfg, e.target.value))}
+                      className="border-border bg-surface text-text w-full rounded-lg border px-3 py-1.5 text-sm"
                     >
-                      {GAME_MODES.map((m) => (
+                      {VALORANT_MAPS.map((m) => (
                         <option key={m} value={m}>
                           {m}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="always-queue" className="text-text text-xs font-medium">
+                      Oyun Modu (Mode)
+                    </label>
+                    <select
+                      id="always-queue"
+                      value={cfg.presence.always_active_valorant_queue || "Competitive"}
+                      onChange={(e) => void applyPatch(withAlwaysActiveValorantQueue(cfg, e.target.value))}
+                      className="border-border bg-surface text-text w-full rounded-lg border px-3 py-1.5 text-sm"
+                    >
+                      {VALORANT_QUEUES.map((q) => (
+                        <option key={q} value={q}>
+                          {q}
                         </option>
                       ))}
                     </select>
@@ -258,7 +283,7 @@ export function DisplayScreen() {
                 </div>
 
                 {/* Oyun Süresi / Timer Kontrolleri */}
-                <div className="border-border bg-surface flex flex-wrap items-center justify-between gap-2.5 rounded-sm border p-2.5">
+                <div className="border-border bg-surface flex flex-wrap items-center justify-between gap-2.5 rounded-lg border p-2.5">
                   <div className="flex items-center gap-2.5">
                     <span className="text-muted text-xs font-medium">Oyun Süresi:</span>
                     <span className="font-mono text-sm font-semibold tracking-wider text-text">
@@ -278,10 +303,9 @@ export function DisplayScreen() {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      id="fake-timer-toggle-btn"
                       onClick={handleToggleTimer}
                       className={
-                        "press flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs font-medium transition-colors " +
+                        "press flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors " +
                         (isStopped
                           ? "bg-accent text-accent-text font-semibold shadow-xs"
                           : "border-border bg-surface-raised text-text hover:bg-surface border")
@@ -301,10 +325,9 @@ export function DisplayScreen() {
                     </button>
                     <button
                       type="button"
-                      id="fake-timer-reset-btn"
                       onClick={handleResetTimer}
                       title="Süreyi Sıfırla"
-                      className="press border-border bg-surface-raised text-muted hover:text-text hover:bg-surface flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-medium transition-colors"
+                      className="press border-border bg-surface-raised text-muted hover:text-text hover:bg-surface flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
                     >
                       <RotateCcw className="h-3.5 w-3.5" />
                       <span>Sıfırla</span>
@@ -312,6 +335,152 @@ export function DisplayScreen() {
                   </div>
                 </div>
               </div>
+            ) : (
+              /* LEAGUE OF LEGENDS Fake Presence */
+              <>
+                <div className="flex flex-col gap-1.5 pt-1 border-t border-border/60">
+                  <label className="text-text text-xs font-medium">Always Active Görünümü (Presence Type)</label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void applyPatch(withAlwaysActiveMode(cfg, "in-client"))}
+                      className={
+                        "press rounded-lg px-3 py-1.5 text-xs font-medium transition-colors " +
+                        (cfg.presence.always_active_mode !== "in-game"
+                          ? "bg-accent text-accent-text font-semibold shadow-xs"
+                          : "bg-surface text-muted hover:text-text border border-border/60")
+                      }
+                    >
+                      🟢 İstemcide (In Client)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void applyPatch(withAlwaysActiveMode(cfg, "in-game"))}
+                      className={
+                        "press rounded-lg px-3 py-1.5 text-xs font-medium transition-colors " +
+                        (cfg.presence.always_active_mode === "in-game"
+                          ? "bg-accent text-accent-text font-semibold shadow-xs"
+                          : "bg-surface text-muted hover:text-text border border-border/60")
+                      }
+                    >
+                      🎮 Oyunda (Fake In-Game)
+                    </button>
+                  </div>
+                </div>
+
+                {cfg.presence.always_active_mode === "in-game" && (
+                  <div className="flex flex-col gap-3 pt-1">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div className="flex flex-col gap-1.5">
+                        <label htmlFor="always-champion" className="text-text text-xs font-medium">
+                          Şampiyon (Champion)
+                        </label>
+                        <input
+                          ref={championInputRef}
+                          id="always-champion"
+                          list="champions-list"
+                          type="text"
+                          value={localChampion ?? cfg.presence.always_active_champion ?? ""}
+                          placeholder="Yasuo"
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setLocalChampion(val);
+                            if (POPULAR_CHAMPIONS.includes(val)) {
+                              void applyPatch(withAlwaysActiveChampion(cfg, val));
+                              setLocalChampion(null);
+                            }
+                          }}
+                          onBlur={() => {
+                            if (localChampion !== null) {
+                              void applyPatch(withAlwaysActiveChampion(cfg, localChampion));
+                              setLocalChampion(null);
+                            }
+                          }}
+                          className="border-border bg-surface text-text w-full rounded-lg border px-3 py-1.5 text-sm"
+                        />
+                        <datalist id="champions-list">
+                          {POPULAR_CHAMPIONS.map((c) => (
+                            <option key={c} value={c} />
+                          ))}
+                        </datalist>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label htmlFor="always-gamemode" className="text-text text-xs font-medium">
+                          Oyun Modu (Game Mode)
+                        </label>
+                        <select
+                          id="always-gamemode"
+                          value={cfg.presence.always_active_game_mode || "Ranked Solo/Duo"}
+                          onChange={(e) => void applyPatch(withAlwaysActiveGameMode(cfg, e.target.value))}
+                          className="border-border bg-surface text-text w-full rounded-lg border px-3 py-1.5 text-sm"
+                        >
+                          {GAME_MODES.map((m) => (
+                            <option key={m} value={m}>
+                              {m}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Oyun Süresi / Timer Kontrolleri */}
+                    <div className="border-border bg-surface flex flex-wrap items-center justify-between gap-2.5 rounded-lg border p-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-muted text-xs font-medium">Oyun Süresi:</span>
+                        <span className="font-mono text-sm font-semibold tracking-wider text-text">
+                          {formatElapsed(currentElapsed)}
+                        </span>
+                        {isStopped ? (
+                          <span className="bg-surface-raised border border-border text-warn rounded px-1.5 py-0.5 text-[10px] font-medium">
+                            Durduruldu
+                          </span>
+                        ) : (
+                          <span className="bg-surface-raised border border-border text-ok rounded px-1.5 py-0.5 text-[10px] font-medium">
+                            Çalışıyor
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          id="fake-timer-toggle-btn"
+                          onClick={handleToggleTimer}
+                          className={
+                            "press flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors " +
+                            (isStopped
+                              ? "bg-accent text-accent-text font-semibold shadow-xs"
+                              : "border-border bg-surface-raised text-text hover:bg-surface border")
+                          }
+                        >
+                          {isStopped ? (
+                            <>
+                              <Play className="h-3.5 w-3.5 fill-current" />
+                              <span>Başlat</span>
+                            </>
+                          ) : (
+                            <>
+                              <Pause className="h-3.5 w-3.5 fill-current" />
+                              <span>Durdur</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          id="fake-timer-reset-btn"
+                          onClick={handleResetTimer}
+                          title="Süreyi Sıfırla"
+                          className="press border-border bg-surface-raised text-muted hover:text-text hover:bg-surface flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" />
+                          <span>Sıfırla</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}

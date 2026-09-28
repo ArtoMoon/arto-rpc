@@ -6,6 +6,9 @@ function snapshot(over: Partial<StatusSnapshot> = {}): StatusSnapshot {
   return {
     league_process: true,
     lcu_connected: true,
+    valorant_process: false,
+    valorant_connected: false,
+    active_game: "league",
     lcu_stalled: false,
     discord_connected: true,
     paused: false,
@@ -49,5 +52,25 @@ describe("summarizeConnection", () => {
 
   it("ignores a stale stall flag once the LCU connects", () => {
     expect(summarizeConnection(snapshot({ lcu_stalled: true })).label).toBe("Connected");
+  });
+
+  it("handles Valorant connected state", () => {
+    const s = snapshot({
+      league_process: false,
+      active_game: "valorant",
+      valorant_process: true,
+      valorant_connected: true,
+    });
+    expect(summarizeConnection(s)).toEqual({ label: "Valorant Connected", tone: "ok" });
+  });
+
+  it("handles Valorant connecting state", () => {
+    const s = snapshot({
+      league_process: false,
+      active_game: "valorant",
+      valorant_process: true,
+      valorant_connected: false,
+    });
+    expect(summarizeConnection(s)).toEqual({ label: "Connecting Valorant", tone: "warn" });
   });
 });

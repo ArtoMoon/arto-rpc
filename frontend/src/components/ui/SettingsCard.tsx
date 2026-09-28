@@ -26,7 +26,7 @@ export function SettingsCard({ icon: Icon, title, description, action, children,
   return (
     <section
       className={
-        "flex flex-col gap-3 rounded-lg border p-6 " +
+        "flex flex-col gap-3 rounded-xl border p-6 shadow-sm transition-all " +
         (highlighted ? "border-accent-border bg-accent-bg" : "border-border bg-surface")
       }
     >

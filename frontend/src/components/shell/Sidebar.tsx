@@ -58,21 +58,19 @@ export function Sidebar({ active, onNavigate, theme, onThemeChange, themeDisable
                 onClick={() => onNavigate(section)}
                 aria-current={isActive ? "page" : undefined}
                 className={
-                  "press flex items-center gap-2 rounded-sm px-2 py-1 text-left text-sm font-medium " +
+                  "press flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm font-medium transition-all " +
                   (isActive
-                    ? "bg-surface-raised text-text"
+                    ? "bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20"
                     : "text-muted hover:bg-surface-raised hover:text-text")
                 }
               >
                 <span
                   className={
-                    // Glyphs stay at full text weight on every row, so the icon
-                    // column reads as a column; only the label dims when inactive.
-                    "text-text relative grid size-8 shrink-0 place-items-center rounded-md transition-colors " +
-                    (isActive ? "bg-accent-bg-strong" : "")
+                    "relative grid size-7 shrink-0 place-items-center rounded-md transition-colors " +
+                    (isActive ? "text-slate-950" : "text-text")
                   }
                 >
-                  <Icon className="size-5" />
+                  <Icon className="size-4.5" />
                   {showUpdateDot && (
                     <span
                       key={section}
