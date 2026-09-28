@@ -3,12 +3,14 @@ import { Window } from "@wailsio/runtime";
 import { GetVersion } from "../../../bindings/github.com/ArtoMoon/arto-rpc/cmd/arto-rpc-gui/guiservice";
 import { useStatus } from "../../hooks/useStatus";
 import { summarizeConnection } from "../../lib/connectionStatus";
+import { useLanguage } from "../../lib/i18n";
 
 // Sleek title bar with the dark gaming palette and window controls
 export function TitleBar() {
   const [version, setVersion] = useState("");
   const [maximised, setMaximised] = useState(false);
-  const connection = summarizeConnection(useStatus());
+  const { language, setLanguage, t } = useLanguage();
+  const connection = summarizeConnection(useStatus(), language);
 
   useEffect(() => {
     GetVersion().then(setVersion).catch(() => {});
@@ -43,6 +45,18 @@ export function TitleBar() {
       </div>
 
       <div className="flex items-center gap-3" style={{ "--wails-draggable": "no-drag" } as CSSProperties}>
+        {/* Language switch button */}
+        <button
+          type="button"
+          onClick={() => setLanguage(language === "en" ? "tr" : "en")}
+          className="press flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800/80 hover:bg-slate-700/80 text-amber-400 border border-slate-700/70 transition-all cursor-pointer"
+          title={language === "en" ? "Türkçe'ye geç" : "Switch to English"}
+        >
+          <span className={language === "en" ? "text-amber-400 font-extrabold" : "text-slate-400"}>EN</span>
+          <span className="text-slate-600">/</span>
+          <span className={language === "tr" ? "text-amber-400 font-extrabold" : "text-slate-400"}>TR</span>
+        </button>
+
         <div className="flex items-center gap-1.5 text-xs text-slate-400">
           <span
             className={
@@ -58,12 +72,12 @@ export function TitleBar() {
         </div>
 
         <div className="flex h-8 items-stretch">
-          <TitleBarButton label="Minimize" onClick={() => void Window.Minimise()}>
+          <TitleBarButton label={t.titleBar.minimize} onClick={() => void Window.Minimise()}>
             <svg viewBox="0 0 10 10" width="10" height="10" aria-hidden>
               <rect x="0" y="4.5" width="10" height="1" fill="currentColor" />
             </svg>
           </TitleBarButton>
-          <TitleBarButton label={maximised ? "Restore" : "Maximize"} onClick={() => void toggleMaximise()}>
+          <TitleBarButton label={maximised ? t.titleBar.restore : t.titleBar.maximize} onClick={() => void toggleMaximise()}>
             {maximised ? (
               <svg viewBox="0 0 10 10" width="10" height="10" aria-hidden>
                 <path d="M2 0h8v8h-2M0 2h8v8H0z" fill="none" stroke="currentColor" strokeWidth="1" />
@@ -74,7 +88,7 @@ export function TitleBar() {
               </svg>
             )}
           </TitleBarButton>
-          <TitleBarButton label="Close" danger onClick={() => void Window.Close()}>
+          <TitleBarButton label={t.titleBar.close} danger onClick={() => void Window.Close()}>
             <svg viewBox="0 0 10 10" width="10" height="10" aria-hidden>
               <path d="M0 0l10 10M10 0L0 10" stroke="currentColor" strokeWidth="1.2" />
             </svg>

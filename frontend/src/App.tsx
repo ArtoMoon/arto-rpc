@@ -1,6 +1,7 @@
 import { AppShell } from "./components/shell/AppShell";
 import { useAppliedTheme } from "./hooks/useAppliedTheme";
 import { useSettings } from "./hooks/useSettings";
+import { LanguageProvider } from "./lib/i18n";
 import type { ThemeSetting } from "./lib/theme";
 
 export default function App() {
@@ -12,11 +13,13 @@ export default function App() {
   }
 
   return (
-    <AppShell
-      theme={cfg?.theme ?? "system"}
-      onThemeChange={handleThemeChange}
-      themeDisabled={!cfg}
-      error={error}
-    />
+    <LanguageProvider>
+      <AppShell
+        theme={cfg?.theme ?? "system"}
+        onThemeChange={handleThemeChange}
+        themeDisabled={!cfg}
+        error={error}
+      />
+    </LanguageProvider>
   );
 }

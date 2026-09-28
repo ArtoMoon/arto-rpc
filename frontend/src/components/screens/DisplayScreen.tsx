@@ -23,7 +23,8 @@ import {
 } from "../../lib/displayPatch";
 import { POPULAR_CHAMPIONS, GAME_MODES } from "../../lib/champions";
 import { VALORANT_AGENTS, VALORANT_MAPS, VALORANT_QUEUES } from "../../lib/valorant";
-import { PRESENCE_CONTEXT_LABELS, PRESENCE_CONTEXTS } from "../../lib/presenceContexts";
+import { getPresenceContextLabel, PRESENCE_CONTEXTS } from "../../lib/presenceContexts";
+import { useLanguage } from "../../lib/i18n";
 import { Field, SettingsCard, Tabs, Toggle } from "../ui";
 import { TemplateEditor } from "./display/TemplateEditor";
 
@@ -45,6 +46,7 @@ function formatElapsed(totalSec: number): string {
 export function DisplayScreen() {
   const { cfg, error, applyPatch } = useSettings();
   const defaults = useDefaultConfig();
+  const { language, t } = useLanguage();
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
   // Local champion input state — avoids the controlled-input flicker where every
   // keystroke round-trips through the backend and resets the cursor position.
@@ -74,7 +76,7 @@ export function DisplayScreen() {
   }, [isFakeInGame, isStopped]);
 
   if (!cfg) {
-    return <p className="text-muted text-sm">Loading settings…</p>;
+    return <p className="text-muted text-sm">{t.display.loading}</p>;
   }
 
   function handleToggleTimer() {
@@ -95,18 +97,18 @@ export function DisplayScreen() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Display</h1>
+      <h1 className="text-xl font-semibold">{t.display.title}</h1>
       {error && <p className="text-danger text-sm">{error}</p>}
 
       <SettingsCard
         icon={Eye}
-        title="What your status shows"
-        description="The extras Arto RPC adds on top of your champion and queue."
+        title={t.display.whatShows}
+        description={t.display.whatShowsDesc}
       >
         <Field
           id="show-rank"
-          label="Show rank"
-          hint="Rank emblem and LP"
+          label={t.display.showRank}
+          hint={t.display.showRankHint}
           onReset={defaults ? () => void applyPatch(withShowRank(cfg, defaults.display.default.show_rank)) : undefined}
           isDefault={!defaults || cfg.display.default.show_rank === defaults.display.default.show_rank}
         >
@@ -114,13 +116,13 @@ export function DisplayScreen() {
             id="show-rank"
             checked={cfg.display.default.show_rank}
             onCheckedChange={(v) => void applyPatch(withShowRank(cfg, v))}
-            label="Show rank"
+            label={t.display.showRank}
           />
         </Field>
         <Field
           id="show-stats"
-          label="Show stats"
-          hint="KDA and creep score"
+          label={t.display.showStats}
+          hint={t.display.showStatsHint}
           onReset={defaults ? () => void applyPatch(withShowStats(cfg, defaults.display.default.show_stats)) : undefined}
           isDefault={!defaults || cfg.display.default.show_stats === defaults.display.default.show_stats}
         >
@@ -128,13 +130,13 @@ export function DisplayScreen() {
             id="show-stats"
             checked={cfg.display.default.show_stats}
             onCheckedChange={(v) => void applyPatch(withShowStats(cfg, v))}
-            label="Show stats"
+            label={t.display.showStats}
           />
         </Field>
         <Field
           id="show-emojis"
-          label="Show status emojis"
-          hint="Online/away indicator"
+          label={t.display.showEmojis}
+          hint={t.display.showEmojisHint}
           onReset={defaults ? () => void applyPatch(withShowEmojis(cfg, defaults.presence.show_emojis)) : undefined}
           isDefault={!defaults || cfg.presence.show_emojis === defaults.presence.show_emojis}
         >
@@ -142,13 +144,13 @@ export function DisplayScreen() {
             id="show-emojis"
             checked={cfg.presence.show_emojis}
             onCheckedChange={(v) => void applyPatch(withShowEmojis(cfg, v))}
-            label="Show status emojis"
+            label={t.display.showEmojis}
           />
         </Field>
         <Field
           id="show-in-client"
-          label="Show presence while in client"
-          hint="Keeps your status up between games, not only during one"
+          label={t.display.showInClient}
+          hint={t.display.showInClientHint}
           onReset={defaults ? () => void applyPatch(withShowInClient(cfg, defaults.presence.show_in_client)) : undefined}
           isDefault={!defaults || cfg.presence.show_in_client === defaults.presence.show_in_client}
         >
@@ -156,13 +158,13 @@ export function DisplayScreen() {
             id="show-in-client"
             checked={cfg.presence.show_in_client}
             onCheckedChange={(v) => void applyPatch(withShowInClient(cfg, v))}
-            label="Show presence while in client"
+            label={t.display.showInClient}
           />
         </Field>
         <Field
           id="always-active"
-          label="Always active presence"
-          hint="Keeps status active 24/7 with a fixed status, whether in a game or not, even when League is closed"
+          label={t.display.alwaysActive}
+          hint={t.display.alwaysActiveHint}
           onReset={defaults ? () => void applyPatch(withAlwaysActive(cfg, defaults.presence.always_active)) : undefined}
           isDefault={!defaults || cfg.presence.always_active === defaults.presence.always_active}
         >
@@ -170,15 +172,15 @@ export function DisplayScreen() {
             id="always-active"
             checked={cfg.presence.always_active}
             onCheckedChange={(v) => void applyPatch(withAlwaysActive(cfg, v))}
-            label="Always active presence"
+            label={t.display.alwaysActive}
           />
         </Field>
         {cfg.presence.always_active && (
           <div className="bg-surface-raised border-border flex flex-col gap-3 rounded-xl border p-4 shadow-sm">
-            {/* Oyun Seçimi: League vs Valorant */}
+            {/* Game Selection: League vs Valorant */}
             <div className="flex flex-col gap-1.5">
               <label className="text-text text-xs font-semibold uppercase tracking-wider text-muted">
-                Oyun Seçimi (Game Platform)
+                {t.display.platformChoice}
               </label>
               <div className="flex gap-2">
                 <button
@@ -214,7 +216,7 @@ export function DisplayScreen() {
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="always-agent" className="text-text text-xs font-medium">
-                      Ajan (Agent)
+                      {t.display.agent}
                     </label>
                     <input
                       id="always-agent"
@@ -247,7 +249,7 @@ export function DisplayScreen() {
 
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="always-map" className="text-text text-xs font-medium">
-                      Harita (Map)
+                      {t.display.map}
                     </label>
                     <select
                       id="always-map"
@@ -265,7 +267,7 @@ export function DisplayScreen() {
 
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="always-queue" className="text-text text-xs font-medium">
-                      Oyun Modu (Mode)
+                      {t.display.queue}
                     </label>
                     <select
                       id="always-queue"
@@ -282,20 +284,20 @@ export function DisplayScreen() {
                   </div>
                 </div>
 
-                {/* Oyun Süresi / Timer Kontrolleri */}
+                {/* Game Timer Controls */}
                 <div className="border-border bg-surface flex flex-wrap items-center justify-between gap-2.5 rounded-lg border p-2.5">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-muted text-xs font-medium">Oyun Süresi:</span>
+                    <span className="text-muted text-xs font-medium">{t.display.gameTimer}:</span>
                     <span className="font-mono text-sm font-semibold tracking-wider text-text">
                       {formatElapsed(currentElapsed)}
                     </span>
                     {isStopped ? (
                       <span className="bg-surface-raised border border-border text-warn rounded px-1.5 py-0.5 text-[10px] font-medium">
-                        Durduruldu
+                        {language === "tr" ? "Durduruldu" : "Paused"}
                       </span>
                     ) : (
                       <span className="bg-surface-raised border border-border text-ok rounded px-1.5 py-0.5 text-[10px] font-medium">
-                        Çalışıyor
+                        {language === "tr" ? "Çalışıyor" : "Running"}
                       </span>
                     )}
                   </div>
@@ -314,23 +316,23 @@ export function DisplayScreen() {
                       {isStopped ? (
                         <>
                           <Play className="h-3.5 w-3.5 fill-current" />
-                          <span>Başlat</span>
+                          <span>{t.display.resumeTimer}</span>
                         </>
                       ) : (
                         <>
                           <Pause className="h-3.5 w-3.5 fill-current" />
-                          <span>Durdur</span>
+                          <span>{t.display.pauseTimer}</span>
                         </>
                       )}
                     </button>
                     <button
                       type="button"
                       onClick={handleResetTimer}
-                      title="Süreyi Sıfırla"
+                      title={t.display.resetTimer}
                       className="press border-border bg-surface-raised text-muted hover:text-text hover:bg-surface flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
                     >
                       <RotateCcw className="h-3.5 w-3.5" />
-                      <span>Sıfırla</span>
+                      <span>{t.display.resetTimer}</span>
                     </button>
                   </div>
                 </div>
@@ -339,7 +341,7 @@ export function DisplayScreen() {
               /* LEAGUE OF LEGENDS Fake Presence */
               <>
                 <div className="flex flex-col gap-1.5 pt-1 border-t border-border/60">
-                  <label className="text-text text-xs font-medium">Always Active Görünümü (Presence Type)</label>
+                  <label className="text-text text-xs font-medium">{t.display.modeChoice}</label>
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -351,7 +353,7 @@ export function DisplayScreen() {
                           : "bg-surface text-muted hover:text-text border border-border/60")
                       }
                     >
-                      🟢 İstemcide (In Client)
+                      🟢 {t.display.modeInClient}
                     </button>
                     <button
                       type="button"
@@ -363,7 +365,7 @@ export function DisplayScreen() {
                           : "bg-surface text-muted hover:text-text border border-border/60")
                       }
                     >
-                      🎮 Oyunda (Fake In-Game)
+                      🎮 {t.display.modeInGame}
                     </button>
                   </div>
                 </div>
@@ -373,7 +375,7 @@ export function DisplayScreen() {
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div className="flex flex-col gap-1.5">
                         <label htmlFor="always-champion" className="text-text text-xs font-medium">
-                          Şampiyon (Champion)
+                          {t.display.champion}
                         </label>
                         <input
                           ref={championInputRef}
@@ -407,7 +409,7 @@ export function DisplayScreen() {
 
                       <div className="flex flex-col gap-1.5">
                         <label htmlFor="always-gamemode" className="text-text text-xs font-medium">
-                          Oyun Modu (Game Mode)
+                          {t.display.gameMode}
                         </label>
                         <select
                           id="always-gamemode"
@@ -424,20 +426,20 @@ export function DisplayScreen() {
                       </div>
                     </div>
 
-                    {/* Oyun Süresi / Timer Kontrolleri */}
+                    {/* Timer Controls */}
                     <div className="border-border bg-surface flex flex-wrap items-center justify-between gap-2.5 rounded-lg border p-2.5">
                       <div className="flex items-center gap-2.5">
-                        <span className="text-muted text-xs font-medium">Oyun Süresi:</span>
+                        <span className="text-muted text-xs font-medium">{t.display.gameTimer}:</span>
                         <span className="font-mono text-sm font-semibold tracking-wider text-text">
                           {formatElapsed(currentElapsed)}
                         </span>
                         {isStopped ? (
                           <span className="bg-surface-raised border border-border text-warn rounded px-1.5 py-0.5 text-[10px] font-medium">
-                            Durduruldu
+                            {language === "tr" ? "Durduruldu" : "Paused"}
                           </span>
                         ) : (
                           <span className="bg-surface-raised border border-border text-ok rounded px-1.5 py-0.5 text-[10px] font-medium">
-                            Çalışıyor
+                            {language === "tr" ? "Çalışıyor" : "Running"}
                           </span>
                         )}
                       </div>
@@ -457,12 +459,12 @@ export function DisplayScreen() {
                           {isStopped ? (
                             <>
                               <Play className="h-3.5 w-3.5 fill-current" />
-                              <span>Başlat</span>
+                              <span>{t.display.resumeTimer}</span>
                             </>
                           ) : (
                             <>
                               <Pause className="h-3.5 w-3.5 fill-current" />
-                              <span>Durdur</span>
+                              <span>{t.display.pauseTimer}</span>
                             </>
                           )}
                         </button>
@@ -470,11 +472,11 @@ export function DisplayScreen() {
                           type="button"
                           id="fake-timer-reset-btn"
                           onClick={handleResetTimer}
-                          title="Süreyi Sıfırla"
+                          title={t.display.resetTimer}
                           className="press border-border bg-surface-raised text-muted hover:text-text hover:bg-surface flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
                         >
                           <RotateCcw className="h-3.5 w-3.5" />
-                          <span>Sıfırla</span>
+                          <span>{t.display.resetTimer}</span>
                         </button>
                       </div>
                     </div>
@@ -486,8 +488,8 @@ export function DisplayScreen() {
         )}
         <Field
           id="credit-text"
-          label="Status hover text"
-          hint="Tooltip text shown on hover over the status icon in Discord"
+          label={language === "tr" ? "Durum üzerine gelme metni" : "Status hover text"}
+          hint={language === "tr" ? "Discord'da durum simgesinin üzerine gelindiğinde görünen metin" : "Tooltip text shown on hover over the status icon in Discord"}
           stacked
           onReset={defaults ? () => void applyPatch(withCreditText(cfg, defaults.presence.credit_text)) : undefined}
           isDefault={!defaults || cfg.presence.credit_text === defaults.presence.credit_text}
@@ -503,8 +505,8 @@ export function DisplayScreen() {
         </Field>
         <Field
           id="button-url"
-          label="Discord profile button (optional)"
-          hint="Adds a clickable button with a link to your Discord profile presence"
+          label={t.display.customButton}
+          hint={t.display.customButtonHint}
           stacked
           onReset={defaults ? () => void applyPatch(withButton(cfg, defaults.presence.button_label, defaults.presence.button_url)) : undefined}
           isDefault={!defaults || (cfg.presence.button_label === defaults.presence.button_label && cfg.presence.button_url === defaults.presence.button_url)}
@@ -515,7 +517,7 @@ export function DisplayScreen() {
               type="text"
               value={cfg.presence.button_label}
               onChange={(e) => void applyPatch(withButton(cfg, e.target.value, cfg.presence.button_url))}
-              placeholder="Button text (e.g. GitHub)"
+              placeholder={t.display.buttonLabel}
               className="border-border bg-surface-raised text-text w-full rounded-sm border px-3 py-1.5 text-sm"
             />
             <input
@@ -523,7 +525,7 @@ export function DisplayScreen() {
               type="text"
               value={cfg.presence.button_url}
               onChange={(e) => void applyPatch(withButton(cfg, cfg.presence.button_label, e.target.value))}
-              placeholder="https://..."
+              placeholder={t.display.buttonUrl}
               className="border-border bg-surface-raised text-text w-full rounded-sm border px-3 py-1.5 text-sm"
             />
           </div>
@@ -532,8 +534,8 @@ export function DisplayScreen() {
 
       <SettingsCard
         icon={MessageSquareText}
-        title="Presence text"
-        description="Write your own wording for each situation, or keep the defaults."
+        title={t.display.templates}
+        description={t.display.templatesDesc}
       >
         <Tabs
           defaultValue={PRESENCE_CONTEXTS[0]}
@@ -541,7 +543,7 @@ export function DisplayScreen() {
             const pair = cfg.presence.templates?.[ctx] ?? { details: "", state: "" };
             return {
               value: ctx,
-              label: PRESENCE_CONTEXT_LABELS[ctx],
+              label: getPresenceContextLabel(ctx, language),
               content: (
                 <TemplateEditor
                   ctx={ctx}

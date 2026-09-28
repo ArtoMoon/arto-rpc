@@ -2,6 +2,7 @@ import { Radio } from "lucide-react";
 import type { StatusSnapshot } from "../../../../bindings/github.com/ArtoMoon/arto-rpc/internal/app/models";
 import { useDiscordAppName } from "../../../hooks/useDiscordAppName";
 import { useSettings } from "../../../hooks/useSettings";
+import { useLanguage } from "../../../lib/i18n";
 import { DiscordPresenceCard } from "../../DiscordPresenceCard";
 import { SettingsCard } from "../../ui";
 
@@ -13,18 +14,19 @@ export interface PresencePreviewProps {
 // recomputation, so this can never disagree with what Discord shows.
 export function PresencePreview({ status }: PresencePreviewProps) {
   const { cfg } = useSettings();
+  const { t } = useLanguage();
   const appName = useDiscordAppName(cfg?.discord_app_id ?? "");
   const presence = status?.presence;
 
   return (
     <SettingsCard
       icon={Radio}
-      title="Discord presence"
-      description="Exactly what Arto RPC last sent to Discord, not a re-guess of it."
+      title={t.home.presenceTitle}
+      description={t.home.presenceDesc}
     >
 
       {status?.presence_cleared || !presence ? (
-        <p className="text-muted text-sm">Presence is currently cleared.</p>
+        <p className="text-muted text-sm">{t.home.presenceCleared}</p>
       ) : (
         <DiscordPresenceCard
           details={presence.Details}

@@ -1,4 +1,4 @@
-import { Bell, CircleSlash, Palette, PanelTopClose, Power } from "lucide-react";
+import { Bell, CircleSlash, Languages, Palette, PanelTopClose, Power } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   GetStatus,
@@ -7,6 +7,7 @@ import {
 import { useDefaultConfig } from "../../hooks/useDefaultConfig";
 import { useSettings } from "../../hooks/useSettings";
 import { useStatus } from "../../hooks/useStatus";
+import { useLanguage } from "../../lib/i18n";
 import {
   withCloseAction,
   withLaunchAtStartup,
@@ -15,19 +16,20 @@ import {
 } from "../../lib/behaviorPatch";
 import { Select, SettingsCard, ThemePicker, Toggle, type SelectOption } from "../ui";
 
-const CLOSE_ACTIONS: SelectOption[] = [
-  { value: "ask", label: "Ask me every time" },
-  { value: "tray", label: "Hide to tray" },
-  { value: "quit", label: "Quit Arto RPC" },
-];
-
 // The Behavior section: how the app looks and behaves around the game.
-// Appearance, pausing, startup and close handling, and update notifications.
+// Appearance, pausing, startup and close handling, update notifications, and language.
 export function BehaviorScreen() {
   const { cfg, error, applyPatch } = useSettings();
   const defaults = useDefaultConfig();
   const status = useStatus();
+  const { language, setLanguage, t } = useLanguage();
   const [paused, setPaused] = useState(false);
+
+  const closeActions: SelectOption[] = [
+    { value: "ask", label: t.behavior.closeActionAsk },
+    { value: "tray", label: t.behavior.closeActionTray },
+    { value: "quit", label: t.behavior.closeActionQuit },
+  ];
 
   // Local override wins until the daemon's own status:changed catches up, so
   // the toggle reflects the click immediately rather than the next broadcast.
@@ -40,8 +42,6 @@ export function BehaviorScreen() {
     try {
       await SetPaused(next);
     } catch {
-      // Re-sync from the daemon rather than assuming !next: a status:changed
-      // broadcast may have already landed while this call was in flight.
       GetStatus()
         .then((s) => setPaused(s.paused))
         .catch(() => setPaused(!next));
@@ -49,18 +49,52 @@ export function BehaviorScreen() {
   }
 
   if (!cfg) {
-    return <p className="text-muted text-sm">Loading settings…</p>;
+    return <p className="text-muted text-sm">{t.common.loading}</p>;
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Behavior</h1>
+      <h1 className="text-xl font-semibold">{t.behavior.title}</h1>
       {error && <p className="text-danger text-sm">{error}</p>}
 
       <SettingsCard
+        icon={Languages}
+        title={t.behavior.language}
+        description={t.behavior.languageDesc}
+        action={
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setLanguage("en")}
+              className={
+                "press rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all " +
+                (language === "en"
+                  ? "bg-accent text-accent-text font-bold shadow-md shadow-amber-500/20"
+                  : "bg-surface text-muted hover:text-text border border-border/60")
+              }
+            >
+              🇬🇧 English
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage("tr")}
+              className={
+                "press rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all " +
+                (language === "tr"
+                  ? "bg-accent text-accent-text font-bold shadow-md shadow-amber-500/20"
+                  : "bg-surface text-muted hover:text-text border border-border/60")
+              }
+            >
+              🇹🇷 Türkçe
+            </button>
+          </div>
+        }
+      />
+
+      <SettingsCard
         icon={Palette}
-        title="Appearance"
-        description="System follows whatever Windows is set to. The sidebar has the same switch, for when you just want it dark right now."
+        title={t.behavior.appearance}
+        description={t.behavior.appearanceDesc}
         onReset={defaults ? () => void applyPatch({ theme: defaults.theme }) : undefined}
         isDefault={!defaults || cfg.theme === defaults.theme}
         action={
@@ -73,23 +107,23 @@ export function BehaviorScreen() {
 
       <SettingsCard
         icon={CircleSlash}
-        title="Pause presence"
-        description="Stops updating your Discord status and clears it right away. Turn it back off whenever you like, and a restart unpauses it too."
+        title={t.behavior.pausePresence}
+        description={t.behavior.pausePresenceDesc}
         action={
           <Toggle
             id="pause-presence"
             checked={paused}
             onCheckedChange={togglePaused}
-            label="Pause presence"
+            label={t.behavior.pausePresence}
           />
         }
       />
 
       <SettingsCard
         icon={Power}
-        title="Start with Windows"
-        description="Launches minimized to the tray when you sign in, so your status is live before your first game."
-        badge="Recommended"
+        title={t.behavior.startWithWindows}
+        description={t.behavior.startWithWindowsDesc}
+        badge={t.common.recommended}
         highlighted
         onReset={defaults ? () => void applyPatch(withLaunchAtStartup(cfg, defaults.behavior.launch_at_startup)) : undefined}
         isDefault={!defaults || cfg.behavior.launch_at_startup === defaults.behavior.launch_at_startup}
@@ -98,32 +132,32 @@ export function BehaviorScreen() {
             id="launch-at-startup"
             checked={cfg.behavior.launch_at_startup}
             onCheckedChange={(v) => void applyPatch(withLaunchAtStartup(cfg, v))}
-            label="Start with Windows"
+            label={t.behavior.startWithWindows}
           />
         }
       />
 
       <SettingsCard
         icon={PanelTopClose}
-        title="When I close the window"
-        description="Hiding keeps your presence running in the background. Reopen it from the tray icon."
+        title={t.behavior.closeAction}
+        description={t.behavior.closeActionDesc}
         onReset={defaults ? () => void applyPatch(withCloseAction(cfg, defaults.behavior.close_action as CloseAction)) : undefined}
         isDefault={!defaults || cfg.behavior.close_action === defaults.behavior.close_action}
         action={
           <Select
-            aria-label="When I close the window"
+            aria-label={t.behavior.closeAction}
             value={cfg.behavior.close_action}
             onValueChange={(v) => void applyPatch(withCloseAction(cfg, v as CloseAction))}
-            options={CLOSE_ACTIONS}
+            options={closeActions}
           />
         }
       />
 
       <SettingsCard
         icon={Bell}
-        title="Update notifications"
-        description="Get notified when a new version is ready to install, so a League update never leaves you behind on a broken build. New releases are also announced in the Discord server."
-        badge="Recommended"
+        title={t.behavior.updateNotifications}
+        description={t.behavior.updateNotificationsDesc}
+        badge={t.common.recommended}
         highlighted
         onReset={defaults ? () => void applyPatch(withNotifyUpdates(cfg, defaults.behavior.notify_updates)) : undefined}
         isDefault={!defaults || cfg.behavior.notify_updates === defaults.behavior.notify_updates}
@@ -132,7 +166,7 @@ export function BehaviorScreen() {
             id="notify-updates"
             checked={cfg.behavior.notify_updates}
             onCheckedChange={(v) => void applyPatch(withNotifyUpdates(cfg, v))}
-            label="Update notifications"
+            label={t.behavior.updateNotifications}
           />
         }
       />

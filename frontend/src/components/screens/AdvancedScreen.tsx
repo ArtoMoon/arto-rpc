@@ -14,6 +14,7 @@ import {
 } from "../../lib/advancedBounds";
 import { DISCORD_DEVELOPER_PORTAL_URL, openExternal } from "../../lib/links";
 import { DebouncedTextField, Field, Select, SettingsCard, Toggle } from "../ui";
+import { useLanguage } from "../../lib/i18n";
 
 // The Advanced section: Discord App ID (preset or custom), the two tuning
 // intervals clamped to the config package's bounds, and debug logging.
@@ -22,6 +23,7 @@ export function AdvancedScreen() {
   const defaults = useDefaultConfig();
   const presets = usePresets();
   const bounds = useConfigBounds();
+  const { t } = useLanguage();
   // null means "not editing custom yet"; once the user types, even an empty
   // string sticks, so clearing the field to retype it doesn't snap back.
   const [customAppId, setCustomAppId] = useState<string | null>(null);
@@ -41,12 +43,12 @@ export function AdvancedScreen() {
   }, [cfg?.discord_app_id, presets]);
 
   if (!cfg) {
-    return <p className="text-muted text-sm">Loading settings…</p>;
+    return <p className="text-muted text-sm">{t.common.loading}</p>;
   }
 
   const presetOptions = [
     ...Object.keys(presets).map((name) => ({ value: name, label: name })),
-    { value: CUSTOM_PRESET_VALUE, label: "Custom" },
+    { value: CUSTOM_PRESET_VALUE, label: t.advanced.customPreset },
   ];
   const appIdInvalid = selectValue === CUSTOM_PRESET_VALUE && customValue.trim() === "";
 
@@ -77,18 +79,18 @@ export function AdvancedScreen() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Advanced</h1>
+      <h1 className="text-xl font-semibold">{t.advanced.title}</h1>
       {error && <p className="text-danger text-sm">{error}</p>}
 
       <SettingsCard
         icon={AppWindow}
-        title="Discord application"
-        description="Which app your presence appears under, including its name and icon on your profile."
+        title={t.advanced.discordApp}
+        description={t.advanced.discordAppDesc}
       >
         <Field
           id="app-id-preset"
-          label="Application"
-          hint="Pick a preset, or point it at your own Discord app"
+          label={t.advanced.application}
+          hint={t.advanced.applicationHint}
           onReset={defaults ? handleAppIdReset : undefined}
           isDefault={!defaults || cfg.discord_app_id === defaults.discord_app_id}
         >

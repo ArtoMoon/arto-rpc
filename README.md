@@ -42,6 +42,7 @@ Welcome to Arto RPC. This application gives you full control over how your Leagu
 - **Rank, LP, KDA, CS & Score.** You choose what to show and what to hide.
 - **Customization.** Full control over how text and timers are displayed on your profile.
 - **Modern Midnight GUI with a tray icon.** Sleek dark gaming aesthetic that runs quietly in the background and can start with Windows.
+- **Bilingual UI.** Full English and Türkçe interface support — switch languages instantly from the app, no restart needed.
 
 Got questions already? Don't hesitate to join the [Discord Community Server](https://discord.gg/uGNkFuK9cj)
 
@@ -208,7 +209,7 @@ For issues related to the code, or project as a whole, please open an [issue on 
 
 - 2023 - This project was previously called `league-rpc-linux`. When Riot introduced Vanguard and broke league on linux, i renamed it to `league-rpc` and kept maintaining it for Windows users. This is why there is a `League of linux` option to select in the application.
 - 2026 - Rewrote the application from a Terminal based Python app, to a Golang application with a GUI and tray app. Needed to rewrite the entire `lcu-driver` from scratch in golang to get it working. So i built [lcu-gopher](https://github.com/Its-Haze/lcu-gopher) which this project now uses.
-- 2026 (v4.1.0) - Added full Valorant integration with auto-detection, Always Active mode for both League & Valorant, and a modern Midnight UI theme overhaul.
+- 2026 (v4.1.0) - Added full Valorant integration with auto-detection, Always Active mode for both League & Valorant, a modern Midnight UI theme overhaul, and a bilingual interface (English / Türkçe) with instant in-app language switching.
 
 ## Star History
 

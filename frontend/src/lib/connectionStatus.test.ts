@@ -73,4 +73,11 @@ describe("summarizeConnection", () => {
     });
     expect(summarizeConnection(s)).toEqual({ label: "Connecting Valorant", tone: "warn" });
   });
+
+  it("translates connection summary to Turkish", () => {
+    expect(summarizeConnection(snapshot(), "tr")).toEqual({ label: "Bağlandı", tone: "ok" });
+    expect(summarizeConnection(snapshot({ paused: true }), "tr")).toEqual({ label: "Duraklatıldı", tone: "warn" });
+    expect(summarizeConnection(snapshot({ league_process: false }), "tr")).toEqual({ label: "League kapalı", tone: "idle" });
+    expect(summarizeConnection(snapshot({ lcu_connected: false }), "tr")).toEqual({ label: "Bağlanıyor", tone: "warn" });
+  });
 });

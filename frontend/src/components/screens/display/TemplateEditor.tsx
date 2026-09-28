@@ -10,6 +10,7 @@ import { usePreviewAssets } from "../../../hooks/usePreviewAssets";
 import type { PresenceContext } from "../../../lib/presenceContexts";
 import { DiscordPresenceCard } from "../../DiscordPresenceCard";
 import { Field } from "../../ui";
+import { useLanguage } from "../../../lib/i18n";
 
 // How long to wait after the last keystroke before persisting the template
 // and re-running the preview, so typing doesn't save/round-trip every key.
@@ -137,17 +138,18 @@ export function TemplateEditor({ ctx, value, onChange, showRank, showStats, show
   }, [ctx, debouncedDraft, showStats, showEmojis]);
 
   const { largeImage, smallImage } = previewImages(ctx, showRank, assets);
+  const { language, t } = useLanguage();
 
   return (
     <div className="flex flex-col gap-4">
       <div className="text-muted text-xs">
-        Available tokens: {tokens.length > 0 ? tokens.map((t) => `{${t}}`).join(" ") : "none"}
+        {t.display.tokensAvailable} {tokens.length > 0 ? tokens.map((t) => `{${t}}`).join(" ") : "none"}
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field
           id={`${ctx}-details`}
-          label="Details line"
+          label={t.display.line1}
           stacked
           onReset={defaultValue ? () => setDraft({ ...draft, details: defaultValue.details }) : undefined}
           isDefault={!defaultValue || draft.details === defaultValue.details}
@@ -156,13 +158,13 @@ export function TemplateEditor({ ctx, value, onChange, showRank, showStats, show
             id={`${ctx}-details`}
             value={draft.details}
             onChange={(e) => setDraft({ ...draft, details: e.target.value })}
-            placeholder="blank uses the built-in default"
+            placeholder={language === "tr" ? "boş bırakılırsa varsayılan kullanılır" : "blank uses the built-in default"}
             className="border-border bg-surface-raised text-text w-full rounded-sm border px-3 py-1.5 text-sm"
           />
         </Field>
         <Field
           id={`${ctx}-state`}
-          label="State line"
+          label={t.display.line2}
           stacked
           onReset={defaultValue ? () => setDraft({ ...draft, state: defaultValue.state }) : undefined}
           isDefault={!defaultValue || draft.state === defaultValue.state}
@@ -171,14 +173,16 @@ export function TemplateEditor({ ctx, value, onChange, showRank, showStats, show
             id={`${ctx}-state`}
             value={draft.state}
             onChange={(e) => setDraft({ ...draft, state: e.target.value })}
-            placeholder="blank uses the built-in default"
+            placeholder={language === "tr" ? "boş bırakılırsa varsayılan kullanılır" : "blank uses the built-in default"}
             className="border-border bg-surface-raised text-text w-full rounded-sm border px-3 py-1.5 text-sm"
           />
         </Field>
       </div>
 
       <div className="border-border flex flex-col gap-2 border-t pt-4">
-        <span className="text-muted text-xs font-semibold tracking-wide uppercase">Preview</span>
+        <span className="text-muted text-xs font-semibold tracking-wide uppercase">
+          {language === "tr" ? "Önizleme" : "Preview"}
+        </span>
         <DiscordPresenceCard details={preview.details} state={preview.state} largeImage={largeImage} smallImage={smallImage} />
         {preview.warnings.length > 0 && (
           <ul className="text-danger text-xs">

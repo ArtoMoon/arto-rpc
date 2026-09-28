@@ -8,6 +8,7 @@ import { DISCORD_COMMUNITY_URL, GITHUB_REPO_URL, openExternal } from "../../lib/
 import { SECTIONS, type Section } from "../../lib/route";
 import { type ThemeSetting } from "../../lib/theme";
 import { ThemePicker } from "../ui";
+import { useLanguage } from "../../lib/i18n";
 
 const NAV: Record<Section, { label: string; icon: LucideIcon }> = {
   home: { label: "Home", icon: House },
@@ -41,7 +42,8 @@ export interface SidebarProps {
 // Left nav across every section, plus a theme shortcut. Behavior has the
 // labeled picker; this compact one is here for reaching it from anywhere.
 export function Sidebar({ active, onNavigate, theme, onThemeChange, themeDisabled }: SidebarProps) {
-  const connection = summarizeConnection(useStatus());
+  const { language, t } = useLanguage();
+  const connection = summarizeConnection(useStatus(), language);
   const updateAvailable = useUpdateStatus()?.available ?? false;
 
   return (
@@ -49,7 +51,8 @@ export function Sidebar({ active, onNavigate, theme, onThemeChange, themeDisable
       <div className="flex flex-1 flex-col gap-1">
         {SECTIONS.map((section) => {
           const isActive = section === active;
-          const { label, icon: Icon } = NAV[section];
+          const { icon: Icon } = NAV[section];
+          const label = t.nav[section];
           const showUpdateDot = section === "about" && updateAvailable;
           return (
             <Fragment key={section}>
